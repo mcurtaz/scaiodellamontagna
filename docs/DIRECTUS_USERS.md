@@ -43,7 +43,7 @@ Settings → **Users** → **Create User**, assign role `Contributor`. Repeat pe
 
 ## 2. Role: API Reader (for the Astro build)
 
-This is the role behind `DIRECTUS_TOKEN` in `.env` — Astro's build step calls the Directus REST/GraphQL API with this token to fetch content at build time. Keep it read-only and scoped to published content only, since it'll eventually run against a production instance too.
+This is the role behind `DIRECTUS_TOKEN` in `.env` — Astro's build step calls the Directus REST/GraphQL API with this token to fetch content at build time. Keep it read-only and scoped to non-archived content only, since it'll eventually run against a production instance too.
 
 Settings → **Access Control** → **Create Role**.
 
@@ -51,15 +51,15 @@ Settings → **Access Control** → **Create Role**.
 - App Access: **off** (never logs into the Studio, API-only)
 - Admin Access: **off**
 
-Permissions — **Read only**, and filtered to published content where applicable:
+Permissions — **Read only**, and filtered to non-archived content where applicable (this Directus version has a boolean `archived` field, not a draft/published/archived Status field):
 
 | Collection | Read |
 |---|---|
-| `articoli` | ✅ Custom — filter: `status equals published` |
-| `itinerari` | ✅ Custom — filter: `status equals published` |
-| `itinerari_correlati` | ✅ All (no status field on this junction; it's just structural data) |
+| `articoli` | ✅ Custom — filter: `archived equals false` |
+| `itinerari` | ✅ Custom — filter: `archived equals false` |
+| `itinerari_correlati` | ✅ All (no archived field on this junction; it's just structural data) |
 | `itinerari_galleria` | ✅ All |
-| `autori` | ✅ All (no status/draft concept for authors) |
+| `autori` | ✅ All (no archived concept for authors) |
 | `directus_files` | ✅ All (needed to resolve image/GPX URLs) |
 
 Everything else: no access.

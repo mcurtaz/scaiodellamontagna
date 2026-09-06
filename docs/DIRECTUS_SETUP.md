@@ -2,6 +2,8 @@
 
 Step-by-step instructions to build the Directus data model described in [`PROJECT_SPEC.md`](./PROJECT_SPEC.md). Follow this once against a fresh local instance (`docker compose up -d`, then open `http://localhost:8055`, log in with `DIRECTUS_ADMIN_EMAIL` / `DIRECTUS_ADMIN_PASSWORD` from `.env`).
 
+The `punto_partenza` / `punto_arrivo` Geometry fields in `itinerari` (section 3) need the PostGIS extension — plain Postgres has no `geometry` type. `docker-compose.yml` uses `postgis/postgis:16-3.4` for this reason. On a fresh volume the image bootstraps the extension itself; if you're migrating an existing database, enable it once with `docker compose exec postgres psql -U directus -d directus -c "CREATE EXTENSION IF NOT EXISTS postgis;"`.
+
 Do these in order: **Autori → Articoli → Itinerari → Itinerari correlati (junction) → Galleria immagini (junction)**. Later collections reference earlier ones.
 
 Field "key" names below are the machine names to type in Directus — use them exactly so later docs (permissions, mock data) line up. The "Note" is optional but recommended for future-you.
@@ -14,7 +16,7 @@ Settings → Data Model → **Create Collection**.
 
 - Name: `autori`
 - Primary key: **Auto-increment integer** (default) — fine, not exposed publicly in URLs.
-- Leave "Optional Fields" (status, sort, date_created, ...) **unchecked** — this collection doesn't need them yet.
+- Leave "Optional Fields" (archived, sort, date_created, ...) **unchecked** — this collection doesn't need them yet.
 
 Add fields (Data Model → `autori` → **Create Field**):
 
@@ -33,15 +35,14 @@ Save. Autori section stays unlinked from navigation/frontend per spec (hidden fo
 **Create Collection** → name `articoli`.
 
 - Primary key: Auto-increment integer.
-- Optional system fields: check **Status** (so we get draft/published/archived out of the box).
+- Optional system fields: check **Archived** — this Directus version doesn't offer a draft/published/archived Status field, just a boolean `archived` field auto-added to the collection.
 
 Fields:
 
 | Key | Type | Interface | Required | Notes |
 |---|---|---|---|---|
-| `status` | (auto-created) | Dropdown (Select) | ✅ | Values: `draft`, `published`, `archived`. Set default to `draft`. |
 | `titolo` | String | Input | ✅ | Article title |
-| `slug` | String | Input (slug) | ✅ | Unique, lowercase-hyphenated. Set the interface to "Slug" so Directus auto-generates it from `titolo`. Add a **Unique** validation. |
+| `slug` | String | Input | ✅ | Unique, lowercase-hyphenated. There's no separate "Slug" interface — use **Input** and enable its **Slug** option (in the interface's field options) so Directus auto-formats it and offers a "populate from `titolo`" button. Add a **Unique** validation. |
 | `immagine` | File (single image) | Image | ✅ | Cover image |
 | `testo` | Text | **Markdown** | ✅ | Body content, stored as raw Markdown (keeps Astro rendering simple — no HTML sanitization needed) |
 | `autore` | Many to One → `autori` | Dropdown (M2O) | ✅ | Single author per article |
@@ -55,15 +56,14 @@ Order the fields in this table order in the Directus form for a natural editing 
 **Create Collection** → name `itinerari`.
 
 - Primary key: Auto-increment integer.
-- Optional system fields: check **Status** (same draft/published/archived pattern).
+- Optional system fields: check **Archived** (same boolean pattern as `articoli` — no draft/published Status field in this Directus version).
 
 Fields — create in this order:
 
 | Key | Type | Interface | Required | Notes |
 |---|---|---|---|---|
-| `status` | (auto) | Dropdown | ✅ | `draft` / `published` / `archived`, default `draft` |
 | `titolo` | String | Input | ✅ | Route title, e.g. "Gita al Rifugio Curò" |
-| `slug` | String | Slug | ✅ | Unique, derived from `titolo` |
+| `slug` | String | Input | ✅ | Unique, derived from `titolo`. Use **Input** with its **Slug** option enabled — no separate "Slug" interface, see note on `articoli` above. |
 | `dislivello_positivo` | Integer | Input | ✅ | Meters, D+ |
 | `dislivello_negativo` | Integer | Input | ✅ | Meters, D- |
 | `tempo_medio_ore` | Decimal | Input | ✅ | Hours, e.g. `3.5` |
@@ -92,7 +92,7 @@ This needs a **Many to Many** field pointing at `directus_files`, because we nee
 4. Let Directus auto-create the junction collection — accept the default name (something like `itinerari_files`) or rename it to `itinerari_galleria` for clarity.
 5. After the field is created, open the auto-created junction collection (`itinerari_galleria`) in Data Model and add one more field to it:
    - Key: `didascalia`, Type: String, Interface: Input — the per-image caption.
-6. Back on `itinerari`, edit the `galleria` field's interface settings and enable **sorting/drag-to-reorder** (Directus does this via a `sort` field it auto-adds to the junction collection — just confirm "Enable Sorting" is on in the field's interface options). This gives editors manual ordering + a caption per photo, per spec.
+6. Back on `itinerari`, edit the `galleria` field again and switch to its **Relationship** tab (not Interface) — set **Sort Field** to `sort` (the field Directus auto-added to the junction collection). This is what turns on drag-to-reorder in the M2M interface; there's no separate "Enable Sorting" toggle in the interface options. This gives editors manual ordering + a caption per photo, per spec.
 
 ---
 

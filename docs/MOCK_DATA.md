@@ -26,7 +26,6 @@ Coordinates and GPX tracks below are **placeholders**, not surveyed — good eno
 
 ### Articolo 1
 
-- `status`: `published`
 - `titolo`: Cosa mettere nello zaino per un'escursione di giornata
 - `slug`: cosa-mettere-nello-zaino
 - `autore`: Michele Curtaz
@@ -57,7 +56,6 @@ Meglio uno zaino un po' più pesante con l'occorrente, che uno leggero senza l'e
 
 ### Articolo 2
 
-- `status`: `published`
 - `titolo`: Come leggere la scala di difficoltà CAI
 - `slug`: scala-difficolta-cai
 - `autore`: Sara Bonetti
@@ -86,7 +84,6 @@ La sigla descrive il tratto più impegnativo dell'intero percorso, non la media.
 
 ### Itinerario 1
 
-- `status`: `published`
 - `titolo`: Gita al Rifugio Curò
 - `slug`: gita-al-rifugio-curo
 - `autore`: Michele Curtaz
@@ -113,7 +110,6 @@ Si sale e si scende dallo stesso sentiero: nessun bivio significativo lungo il p
 
 ### Itinerario 2
 
-- `status`: `published`
 - `titolo`: Rifugio Curò → Lago Gelt
 - `slug`: rifugio-curo-lago-gelt
 - `autore`: Michele Curtaz
