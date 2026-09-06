@@ -1,0 +1,89 @@
+# Directus Setup — Roles, Users & Permissions
+
+Do this **after** [`DIRECTUS_SETUP.md`](./DIRECTUS_SETUP.md) (permissions are set per-collection, so the collections must exist first).
+
+Three roles, per `PROJECT_SPEC.md`:
+
+1. **Administrator** — you. Already exists by default in Directus, full access. Nothing to configure.
+2. **Contributor** — other people who write articles/routes.
+3. **API Reader** — not a human role. A machine role used by the Astro build to pull published content via a static token, kept separate from the public "Public" role so access can be locked down precisely and rotated independently.
+
+---
+
+## 1. Role: Contributor
+
+Settings → **Access Control** → **Create Role**.
+
+- Name: `Contributor`
+- App Access: **on** (they need to log into the Studio to write content)
+- Admin Access: **off**
+
+Set permissions (click into the role, then per-collection):
+
+| Collection | Create | Read | Update | Delete |
+|---|---|---|---|---|
+| `articoli` | ✅ All | ✅ All | ✅ All | ✅ All |
+| `itinerari` | ✅ All | ✅ All | ✅ All | ✅ All |
+| `itinerari_correlati` | ✅ All | ✅ All | ✅ All | ✅ All |
+| `itinerari_galleria` | ✅ All | ✅ All | ✅ All | ✅ All |
+| `autori` | ❌ | ✅ All | ❌ | ❌ |
+| `directus_files` | ✅ All | ✅ All | ✅ All (own uploads is enough, but "All" is simpler for v1) | ❌ |
+
+Everything else (Settings, Data Model, Users, Roles, Webhooks, Flows, ...) stays with **no access** — Contributors simply won't see those modules in the Studio sidebar.
+
+Rationale for `autori` being read-only for Contributors: they need to *pick* an author when writing an article/route, but per spec author management isn't a Contributor concern for v1. If a Contributor is also going to be an author, you (Administrator) create their `autori` record for them.
+
+> **Upgrade path noted in `PROJECT_SPEC.md`**: to later restrict Contributors to editing only their own `articoli`/`itinerari`, edit the **Update** and **Delete** permission rows above from "All" to a custom rule: `user_created equals $CURRENT_USER`. Everything else stays the same.
+
+### Create Contributor users
+
+Settings → **Users** → **Create User**, assign role `Contributor`. Repeat per person.
+
+---
+
+## 2. Role: API Reader (for the Astro build)
+
+This is the role behind `DIRECTUS_TOKEN` in `.env` — Astro's build step calls the Directus REST/GraphQL API with this token to fetch content at build time. Keep it read-only and scoped to published content only, since it'll eventually run against a production instance too.
+
+Settings → **Access Control** → **Create Role**.
+
+- Name: `API Reader`
+- App Access: **off** (never logs into the Studio, API-only)
+- Admin Access: **off**
+
+Permissions — **Read only**, and filtered to published content where applicable:
+
+| Collection | Read |
+|---|---|
+| `articoli` | ✅ Custom — filter: `status equals published` |
+| `itinerari` | ✅ Custom — filter: `status equals published` |
+| `itinerari_correlati` | ✅ All (no status field on this junction; it's just structural data) |
+| `itinerari_galleria` | ✅ All |
+| `autori` | ✅ All (no status/draft concept for authors) |
+| `directus_files` | ✅ All (needed to resolve image/GPX URLs) |
+
+Everything else: no access.
+
+### Generate the static token
+
+1. Settings → Users → **Create User** (yes, a token needs a user account to attach to, even for a role with App Access off).
+   - Name: e.g. `astro-build`
+   - Email: any placeholder, e.g. `astro-build@scaiodellamontagna.local` (doesn't need to be real, it's not used for login)
+   - Role: `API Reader`
+   - Status: **Active**
+2. Open that user → scroll to **Token** field → generate a static access token.
+3. Copy it into `.env` as `DIRECTUS_TOKEN`.
+
+This matches what `.env.example` already expects: `DIRECTUS_TOKEN=your-static-token-here`.
+
+---
+
+## Recap
+
+| Role | Who | App Access | Scope |
+|---|---|---|---|
+| Administrator | you (`michele.curtaz@libemax.com`) | ✅ | everything |
+| Contributor | other writers | ✅ | full CRUD on `articoli`/`itinerari`(+junctions), read-only `autori` |
+| API Reader | `astro-build` service user, static token | ❌ | read-only, published content only |
+
+Next: [`MOCK_DATA.md`](./MOCK_DATA.md) to populate mock content for local Astro development.
