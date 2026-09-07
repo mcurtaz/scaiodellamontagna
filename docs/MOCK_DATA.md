@@ -134,13 +134,12 @@ Prosecuzione naturale della salita al Rifugio Curò per chi vuole raggiungere il
 
 ### Link tra i due itinerari
 
-In `itinerari_correlati`, crea una riga:
+Apri uno dei due itinerari (es. "Gita al Rifugio Curò") e usa il campo `correlati` per aggiungere l'altro:
 
-- `itinerario_da`: Gita al Rifugio Curò
-- `itinerario_a`: Rifugio Curò → Lago Gelt
+- Itinerario collegato: Rifugio Curò → Lago Gelt
 - `tipo`: `prosecuzione`
 
-Questo è l'esempio esatto discusso in `PROJECT_SPEC.md` per la modeling philosophy: due record indipendenti, collegati da una relazione tipizzata, invece di un unico percorso composto automaticamente.
+Non serve creare il link anche dal secondo itinerario: la build Astro interroga la relazione in entrambe le direzioni, quindi comparirà su entrambe le pagine automaticamente. Questo è l'esempio esatto discusso in `PROJECT_SPEC.md` per la modeling philosophy: due record indipendenti, collegati da una relazione tipizzata, invece di un unico percorso composto automaticamente.
 
 ---
 

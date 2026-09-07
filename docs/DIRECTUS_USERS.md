@@ -25,7 +25,7 @@ Set permissions (click into the role, then per-collection):
 | `articoli` | ✅ All | ✅ All | ✅ All | ✅ All |
 | `itinerari` | ✅ All | ✅ All | ✅ All | ✅ All |
 | `itinerari_correlati` | ✅ All | ✅ All | ✅ All | ✅ All |
-| `itinerari_directus_files` | ✅ All | ✅ All | ✅ All | ✅ All |
+| `itinerari_galleria` | ✅ All | ✅ All | ✅ All | ✅ All |
 | `autori` | ❌ | ✅ All | ❌ | ❌ |
 | `directus_files` | ✅ All | ✅ All | ✅ All (own uploads is enough, but "All" is simpler for v1) | ❌ |
 
@@ -60,7 +60,7 @@ Permissions — **Read only, all records**:
 | `articoli` | ✅ All (filter `archived equals false` at query time in Astro — see note above) |
 | `itinerari` | ✅ All (filter `archived equals false` at query time in Astro — see note above) |
 | `itinerari_correlati` | ✅ All (no archived field on this junction; it's just structural data) |
-| `itinerari_directus_files` | ✅ All |
+| `itinerari_galleria` | ✅ All |
 | `autori` | ✅ All (no archived concept for authors) |
 | `directus_files` | ✅ All (needed to resolve image/GPX URLs) |
 

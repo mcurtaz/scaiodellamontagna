@@ -122,27 +122,39 @@ This needs a **Many to Many** field pointing at `directus_files`, because we nee
 1. Go to `itinerari` → **Create Field** → type **Many to Many**.
 2. Key: `galleria`.
 3. Related collection: pick **Directus Files** (this is the built-in files table — Directus offers this directly in the M2M wizard as a special case, sometimes labeled "Files" instead of a normal M2M).
-4. Let Directus auto-create the junction collection — accept the default name (something like `itinerari_files`) or rename it to `itinerari_directus_files` for clarity.
-5. After the field is created, open the auto-created junction collection (`itinerari_directus_files`) in Data Model and add one more field to it:
+4. Let Directus auto-create the junction collection — accept the default name (something like `itinerari_files`) or rename it to `itinerari_galleria` for clarity.
+5. After the field is created, open the auto-created junction collection (`itinerari_galleria`) in Data Model and add one more field to it:
    - Key: `didascalia`, Type: String, Interface: Input — the per-image caption.
 6. Back on `itinerari`, edit the `galleria` field again and switch to its **Relationship** tab (not Interface) — set **Sort Field** to `sort` (the field Directus auto-added to the junction collection). This is what turns on drag-to-reorder in the M2M interface; there's no separate "Enable Sorting" toggle in the interface options. This gives editors manual ordering + a caption per photo, per spec.
 7. Still on the `galleria` field, switch to its **Interface** tab → **Folder** setting → select `Itinerari / Galleria`. New gallery uploads then default into that folder instead of the root of the File Library.
 
 ---
 
-## 5. Collection: `itinerari_correlati` (typed relation between routes)
+## 5. Field: `correlati` (typed, symmetric relation between routes)
 
-This is the "itinerari correlati" relation from `PROJECT_SPEC.md` — a self-referencing many-to-many on `itinerari`, qualified with a `tipo` field. Build it as an explicit junction collection rather than the M2M wizard, it's clearer for a self-relation:
+This is the "itinerari correlati" relation from `PROJECT_SPEC.md` — a self-referencing many-to-many on `itinerari`, qualified with a `tipo` field. There is **no "da/a" direction**: `tipo` describes how the two routes relate (`prosecuzione`, `variante`, `nella_zona`), not which one comes first, so a single field is enough on either side of the link. Build it with the M2M wizard, same pattern as `galleria` in section 4:
 
-1. **Create Collection** → name `itinerari_correlati`.
-   - Primary key: Auto-increment integer.
-   - No optional system fields needed.
-2. Add field `itinerario_da`: **Many to One** → related collection `itinerari`. Required.
-3. Add field `itinerario_a`: **Many to One** → related collection `itinerari`. Required.
-4. Add field `tipo`: **String**, interface **Dropdown**, required. Choices: `prosecuzione: Prosecuzione`, `variante: Variante`, `nella_zona: Nella stessa zona`.
-5. Go back to `itinerari` → **Create Field** → type **One to Many** → related collection `itinerari_correlati`, foreign key field `itinerario_da`. Key this field e.g. `itinerari_correlati_da_qui` — this is what shows up on a route's edit page as "the list of relations where this route is the starting point."
+1. Go to `itinerari` → **Create Field** → type **Many to Many**.
+2. Key: `correlati`.
+3. Related collection: `itinerari` (self-referencing).
+4. Let Directus auto-create the junction collection — rename it to `itinerari_correlati` for clarity. Name the two auto-created FK fields on the junction something neutral, e.g. `itinerari_id` (this route) and `itinerario_correlato` (the other route) — avoid `_da`/`_a` naming, it's misleading now that the relation isn't directional.
+5. Open the junction collection (`itinerari_correlati`) in Data Model and add one more field:
+   - Key: `tipo`, Type: String, Interface: **Dropdown**, required. Choices: `prosecuzione: Prosecuzione`, `variante: Variante`, `nella_zona: Nella stessa zona`.
+6. Back on `itinerari`, edit the `correlati` field again — its **Interface** tab should show a simple picker: choose the other route + `tipo` in one panel. That's the entire editing flow, regardless of which route you're editing or which `tipo` you pick.
 
-This is enough for v1 (manual selection, per spec). Editors create a row in `itinerari_correlati` picking the two routes and the relation type; the Astro build later reads this table to render "puoi proseguire fino a..." / "varianti" / "nella zona" sections. (A frontend detail — not needed to decide now — is whether to also show the *inverse* direction, e.g. showing the link on Lago Gelt's page pointing back to Rifugio Curò. That's a query-time decision in Astro, not a schema decision.)
+### Preventing a route from linking to itself
+
+Add a **Flow** (Settings → Flows → **Create Flow**) so an editor can't accidentally save a row where both sides of the link point at the same route:
+
+1. Trigger: **Event Hook** → type **Filter** (blocking) → scope `items.create`, `items.update` → collection `itinerari_correlati`.
+2. Add a **Condition** operation checking `{{$trigger.payload.itinerari_id}}` equals `{{$trigger.payload.itinerario_correlato}}`.
+3. On the "true" branch, add a **Trigger Flow Error** (or equivalent "throw" operation) so the save is rejected with a clear message, e.g. "Un itinerario non può essere correlato a sé stesso."
+
+### Bidirectional display on the site
+
+Linking route A to route B once is enough — don't create a second row for the reverse direction. The Astro build reads `itinerari_correlati` filtering on **either** FK (`itinerari_id = X OR itinerario_correlato = X`) so the relation shows up on both A's and B's pages automatically, with the same `tipo`. This is no longer an optional "decide later" detail (as earlier drafts of this doc had it) — it's the default query shape for this relation.
+
+Known limitation, accepted for v1: because this is a self-referencing M2M, editing route B's Directus admin page won't show a link that was added *from* route A's side (Directus only lists rows where `itinerari_id` = the record you're editing). The link still renders correctly on the live site either way. If admin-side visibility of incoming links becomes annoying in practice, a second read-only field on `itinerari` (pointing at `itinerario_correlato` instead) can be added later without changing this structure.
 
 ---
 
@@ -151,8 +163,8 @@ This is enough for v1 (manual selection, per spec). Editors create a row in `iti
 - `autori`
 - `articoli`
 - `itinerari`
-- `itinerari_correlati` (junction: `itinerario_da`, `itinerario_a`, `tipo`)
-- `itinerari_directus_files` (auto-created junction for the `galleria` M2M: file, `didascalia`, `sort`)
+- `itinerari_correlati` (auto-created junction for the self-referencing `correlati` M2M: `itinerari_id`, `itinerario_correlato`, `tipo`)
+- `itinerari_galleria` (auto-created junction for the `galleria` M2M: file, `didascalia`, `sort`)
 
 ## Recap of File Library folders created
 
