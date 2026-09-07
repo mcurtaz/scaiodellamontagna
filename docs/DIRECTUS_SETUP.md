@@ -4,9 +4,36 @@ Step-by-step instructions to build the Directus data model described in [`PROJEC
 
 The `punto_partenza` / `punto_arrivo` Geometry fields in `itinerari` (section 3) need the PostGIS extension — plain Postgres has no `geometry` type. `docker-compose.yml` uses `postgis/postgis:16-3.4` for this reason. On a fresh volume the image bootstraps the extension itself; if you're migrating an existing database, enable it once with `docker compose exec postgres psql -U directus -d directus -c "CREATE EXTENSION IF NOT EXISTS postgis;"`.
 
-Do these in order: **Autori → Articoli → Itinerari → Itinerari correlati (junction) → Galleria immagini (junction)**. Later collections reference earlier ones.
+Do these in order: **File Library folders → Autori → Articoli → Itinerari → Itinerari correlati (junction) → Galleria immagini (junction)**. Later collections reference earlier ones, and the folders need to exist before you set them as a field's default in steps 1-4.
 
 Field "key" names below are the machine names to type in Directus — use them exactly so later docs (permissions, mock data) line up. The "Note" is optional but recommended for future-you.
+
+---
+
+## 0. File Library — Folders
+
+Every uploaded file (author photos, article covers, GPX tracks, gallery images) currently lands in one flat, unorganized `directus_files` bucket. Split them into folders so the File Library stays browsable as content grows.
+
+Go to the **File Library** module (sidebar, folder icon) → **Create Folder**:
+
+1. Create `Autori`.
+2. Create `Articoli`.
+3. Create `Itinerari` — then open it and **Create Folder** again *inside* it (nested) to add:
+   - `GPX`
+   - `Galleria`
+
+End state:
+
+```
+File Library
+├── Autori
+├── Articoli
+└── Itinerari
+    ├── GPX
+    └── Galleria
+```
+
+These are plain organizational folders in the File Library, not new collections — `directus_files` stays a single table, folders just group rows by a `folder` reference. Each file field below gets pointed at one of these as its **default upload folder** (see the "Folder" note on each field) — this only changes where *new* uploads are filed and which folder the file picker opens into by default; it doesn't restrict a field to *only* files from that folder.
 
 ---
 
@@ -25,6 +52,8 @@ Add fields (Data Model → `autori` → **Create Field**):
 | `nome` | String | Input | ✅ | Full name of the author |
 | `bio` | Text | Textarea | — | Short bio, plain text is enough for v1 |
 | `foto` | File (single image) | Image | — | Optional headshot |
+
+After creating `foto`: edit the field → **Interface** tab → **Folder** setting → select `Autori` (the folder created in section 0). This makes new headshot uploads default into `File Library / Autori`.
 
 Save. Autori section stays unlinked from navigation/frontend per spec (hidden for now) — this is just a Directus content collection, no extra config needed for "hiding" it since there's no public listing yet.
 
@@ -46,6 +75,8 @@ Fields:
 | `immagine` | File (single image) | Image | ✅ | Cover image |
 | `testo` | Text | **Markdown** | ✅ | Body content, stored as raw Markdown (keeps Astro rendering simple — no HTML sanitization needed) |
 | `autore` | Many to One → `autori` | Dropdown (M2O) | ✅ | Single author per article |
+
+After creating `immagine`: edit the field → **Interface** tab → **Folder** setting → select `Articoli`.
 
 Order the fields in this table order in the Directus form for a natural editing flow (drag to reorder in the Data Model screen).
 
@@ -78,6 +109,8 @@ Fields — create in this order:
 | `descrizione` | Text | Markdown | ✅ | Route description |
 | `autore` | Many to One → `autori` | Dropdown (M2O) | ✅ | |
 
+After creating `traccia_gpx`: edit the field → **Interface** tab → **Folder** setting → select `Itinerari / GPX`.
+
 Don't add `galleria` or `itinerari_correlati` yet — those need extra collections, done in the next two sections.
 
 ---
@@ -89,10 +122,11 @@ This needs a **Many to Many** field pointing at `directus_files`, because we nee
 1. Go to `itinerari` → **Create Field** → type **Many to Many**.
 2. Key: `galleria`.
 3. Related collection: pick **Directus Files** (this is the built-in files table — Directus offers this directly in the M2M wizard as a special case, sometimes labeled "Files" instead of a normal M2M).
-4. Let Directus auto-create the junction collection — accept the default name (something like `itinerari_files`) or rename it to `itinerari_galleria` for clarity.
-5. After the field is created, open the auto-created junction collection (`itinerari_galleria`) in Data Model and add one more field to it:
+4. Let Directus auto-create the junction collection — accept the default name (something like `itinerari_files`) or rename it to `itinerari_directus_files` for clarity.
+5. After the field is created, open the auto-created junction collection (`itinerari_directus_files`) in Data Model and add one more field to it:
    - Key: `didascalia`, Type: String, Interface: Input — the per-image caption.
 6. Back on `itinerari`, edit the `galleria` field again and switch to its **Relationship** tab (not Interface) — set **Sort Field** to `sort` (the field Directus auto-added to the junction collection). This is what turns on drag-to-reorder in the M2M interface; there's no separate "Enable Sorting" toggle in the interface options. This gives editors manual ordering + a caption per photo, per spec.
+7. Still on the `galleria` field, switch to its **Interface** tab → **Folder** setting → select `Itinerari / Galleria`. New gallery uploads then default into that folder instead of the root of the File Library.
 
 ---
 
@@ -118,6 +152,13 @@ This is enough for v1 (manual selection, per spec). Editors create a row in `iti
 - `articoli`
 - `itinerari`
 - `itinerari_correlati` (junction: `itinerario_da`, `itinerario_a`, `tipo`)
-- `itinerari_galleria` (auto-created junction for the `galleria` M2M: file, `didascalia`, `sort`)
+- `itinerari_directus_files` (auto-created junction for the `galleria` M2M: file, `didascalia`, `sort`)
+
+## Recap of File Library folders created
+
+- `Autori` — default for `autori.foto`
+- `Articoli` — default for `articoli.immagine`
+- `Itinerari / GPX` — default for `itinerari.traccia_gpx`
+- `Itinerari / Galleria` — default for `itinerari.galleria`
 
 Next: [`DIRECTUS_USERS.md`](./DIRECTUS_USERS.md) for roles and permissions, then [`MOCK_DATA.md`](./MOCK_DATA.md) to populate content for the Astro build.

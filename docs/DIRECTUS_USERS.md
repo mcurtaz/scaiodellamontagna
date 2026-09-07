@@ -25,7 +25,7 @@ Set permissions (click into the role, then per-collection):
 | `articoli` | ✅ All | ✅ All | ✅ All | ✅ All |
 | `itinerari` | ✅ All | ✅ All | ✅ All | ✅ All |
 | `itinerari_correlati` | ✅ All | ✅ All | ✅ All | ✅ All |
-| `itinerari_galleria` | ✅ All | ✅ All | ✅ All | ✅ All |
+| `itinerari_directus_files` | ✅ All | ✅ All | ✅ All | ✅ All |
 | `autori` | ❌ | ✅ All | ❌ | ❌ |
 | `directus_files` | ✅ All | ✅ All | ✅ All (own uploads is enough, but "All" is simpler for v1) | ❌ |
 
@@ -43,7 +43,7 @@ Settings → **Users** → **Create User**, assign role `Contributor`. Repeat pe
 
 ## 2. Role: API Reader (for the Astro build)
 
-This is the role behind `DIRECTUS_TOKEN` in `.env` — Astro's build step calls the Directus REST/GraphQL API with this token to fetch content at build time. Keep it read-only and scoped to non-archived content only, since it'll eventually run against a production instance too.
+This is the role behind `DIRECTUS_TOKEN` in `.env` — Astro's build step calls the Directus REST/GraphQL API with this token to fetch content at build time. Keep it read-only.
 
 Settings → **Access Control** → **Create Role**.
 
@@ -51,14 +51,16 @@ Settings → **Access Control** → **Create Role**.
 - App Access: **off** (never logs into the Studio, API-only)
 - Admin Access: **off**
 
-Permissions — **Read only**, and filtered to non-archived content where applicable (this Directus version has a boolean `archived` field, not a draft/published/archived Status field):
+Permissions — **Read only, all records**:
+
+> **Note**: ideally `articoli`/`itinerari` reads would be filtered with a Custom permission (`archived equals false`), so the Astro build never sees archived content. Custom field-level filters require a **Custom policy**, which is a premium (paid) Directus Cloud/Enterprise feature — this project doesn't have a premium instance yet. Until then, grant **All** and filter out `archived` records at query time in the Astro build instead. Revisit this once a premium instance is available (see `PROJECT_SPEC.md` upgrade notes).
 
 | Collection | Read |
 |---|---|
-| `articoli` | ✅ Custom — filter: `archived equals false` |
-| `itinerari` | ✅ Custom — filter: `archived equals false` |
+| `articoli` | ✅ All (filter `archived equals false` at query time in Astro — see note above) |
+| `itinerari` | ✅ All (filter `archived equals false` at query time in Astro — see note above) |
 | `itinerari_correlati` | ✅ All (no archived field on this junction; it's just structural data) |
-| `itinerari_galleria` | ✅ All |
+| `itinerari_directus_files` | ✅ All |
 | `autori` | ✅ All (no archived concept for authors) |
 | `directus_files` | ✅ All (needed to resolve image/GPX URLs) |
 
@@ -84,6 +86,6 @@ This matches what `.env.example` already expects: `DIRECTUS_TOKEN=your-static-to
 |---|---|---|---|
 | Administrator | you (`michele.curtaz@libemax.com`) | ✅ | everything |
 | Contributor | other writers | ✅ | full CRUD on `articoli`/`itinerari`(+junctions), read-only `autori` |
-| API Reader | `astro-build` service user, static token | ❌ | read-only, published content only |
+| API Reader | `astro-build` service user, static token | ❌ | read-only, all content (archived filtering done at query time until a premium instance enables Custom policies) |
 
 Next: [`MOCK_DATA.md`](./MOCK_DATA.md) to populate mock content for local Astro development.
