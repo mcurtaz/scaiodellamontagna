@@ -1,0 +1,10 @@
+---
+import { SITE_NAME, CONTACT_EMAIL } from "../lib/site";
+---
+
+<footer
+  class="flex flex-wrap justify-between gap-x-6 gap-y-2 px-4 py-3 sm:px-8 md:px-14 border-t border-inchiostro/20 font-display text-[12.5px] text-inchiostro/80"
+>
+  <span>{SITE_NAME}</span>
+  <a href={`mailto:${CONTACT_EMAIL}`} class="hover:text-inchiostro">Contatti</a>
+</footer>

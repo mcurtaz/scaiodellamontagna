@@ -1,1 +1,24 @@
 @import "tailwindcss";
+
+@import "@fontsource/epilogue/400.css";
+@import "@fontsource/epilogue/500.css";
+@import "@fontsource/epilogue/600.css";
+@import "@fontsource/ibm-plex-mono/400.css";
+@import "@fontsource/ibm-plex-mono/500.css";
+@import "@fontsource/ibm-plex-mono/600.css";
+
+@theme {
+  --color-crema: #F4EEE1;
+  --color-inchiostro: #1B2A25;
+  --color-salvia: #A9C1B0;
+  --color-verde: #3B5C4B;
+  --color-terra: #6E3A08;
+  --color-pietra: #DCD9C6;
+
+  --font-display: "Epilogue", system-ui, sans-serif;
+  --font-mono-data: "IBM Plex Mono", ui-monospace, monospace;
+}
+
+body {
+  @apply bg-crema text-inchiostro font-display;
+}
