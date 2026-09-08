@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet"><style>
+body{margin:0;background:#E6E2D8;font-family:Epilogue,system-ui,sans-serif}
+a{color:#6E3A08}a:hover{color:#502A05}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 8px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#23201C;color:#fff;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 Epilogue,sans-serif;color:#23201C}
+.dv-note{margin:0 0 22px;max-width:760px;font:400 12px/1.6 Epilogue,sans-serif;color:rgba(0,0,0,.55)}
+.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#23201C;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 Epilogue,sans-serif;color:rgba(0,0,0,.55)}
+.dv-card{max-width:100%;background:#F8F4ED;border:1px solid rgba(0,0,0,.1);border-radius:6px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}
+.dv-opt:target .dv-oid{background:#6E3A08;color:#fff}
+.dv-next{margin:22px 0 0;font:12px/1.5 Epilogue,sans-serif;color:rgba(0,0,0,.5)}
+</style></helmet>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Modello — home/about, itinerari, itinerario</span></div>
+<p class="dv-note">Modello approvato, tre pagine. La home è anche l'about: titolo centrato con i link sotto, presentazione del sito nella fascia salvia, poi ultimi articoli e ultimi itinerari come liste con miniature. Nessuna pagina cerca: i filtri stanno in cima a Itinerari. Impaginazione: etichette di sezione sul filetto con azione a destra, griglia 1,5 / 1, una fascia salvia per pagina, raggi 8 px, galleria a griglia con apertura a piena larghezza.<br>Palette: crema #F4EEE1, inchiostro #1B2A25, salvia #A9C1B0, verde #3B5C4B, terra #6E3A08, pietra #DCD9C6. Caratteri: Epilogue per il testo, IBM Plex Mono per dati ed etichette.</p>
+<div class="dv-opts" style="flex-direction:column;gap:44px">
+
+<div class="dv-opt" id="1a">
+<div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a><strong style="font-weight:600;color:rgba(0,0,0,.75)">Modello</strong> — home/about, itinerari, itinerario</div>
+<div style="display:flex;gap:24px;align-items:flex-start">
+
+<div class="dv-card" style="width:1000px;background:#F4EEE1;border-radius:10px">
+<div style="font-family:Epilogue,sans-serif;color:#1B2A25">
+<div style="padding:52px 56px 30px;text-align:center;border-bottom:1px solid rgba(27,42,37,.2)">
+<div style="font:500 34px/1 Epilogue,sans-serif;letter-spacing:-.03em">Scaio della Montagna</div>
+<div style="display:flex;justify-content:center;gap:28px;margin-top:22px;font:400 13.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.82)"><span>Articoli</span><span>Itinerari</span><span>Contatti</span></div>
+</div>
+
+<div style="background:#A9C1B0;padding:44px 56px 48px">
+<div style="display:flex;align-items:center;gap:16px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#6E3A08">IL SITO</span><span style="flex:1;height:1px;background:rgba(27,42,37,.22)"></span></div>
+<div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;padding-top:32px;align-items:end">
+<h1 style="font:500 40px/1.18 Epilogue,sans-serif;margin:0;letter-spacing:-.028em;text-wrap:pretty">Un archivio personale di uscite in montagna, camminate e misurate sul posto.</h1>
+<div>
+<p style="font:400 16px/1.65 Epilogue,sans-serif;margin:0;color:rgba(27,42,37,.82)">Ogni itinerario nasce da una traccia GPX registrata durante l'uscita. Gli articoli sono appunti sparsi: attrezzatura, letture della difficoltà, cose imparate sbagliando.</p>
+<div style="font:400 13px/1.9 'IBM Plex Mono',monospace;color:rgba(27,42,37,.82);margin-top:20px">itinerari · 2 &nbsp; articoli · 2<br>zona · orobie &nbsp; contatti · email</div>
+</div>
+</div>
+</div>
+
+<div style="padding:44px 56px 40px">
+<div style="display:flex;align-items:center;gap:16px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#3B5C4B">ULTIMI ARTICOLI</span><span style="flex:1;height:1px;background:rgba(27,42,37,.2)"></span><span style="font:400 12.5px/1 Epilogue,sans-serif;color:#6E3A08">Tutti gli articoli →</span></div>
+<div style="display:grid;grid-template-columns:96px minmax(0,1fr) 150px;gap:24px;padding:20px 0;border-bottom:1px solid rgba(27,42,37,.14);align-items:center"><div style="height:72px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(135deg,rgba(27,42,37,.06) 0 6px,transparent 6px 12px)"></div><h3 style="font:400 25px/1.28 Epilogue,sans-serif;margin:0;letter-spacing:-.018em">Cosa mettere nello zaino per un'escursione di giornata</h3><div style="font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8);text-align:right">michele curtaz</div></div>
+<div style="display:grid;grid-template-columns:96px minmax(0,1fr) 150px;gap:24px;padding:20px 0;align-items:center"><div style="height:72px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(135deg,rgba(27,42,37,.06) 0 6px,transparent 6px 12px)"></div><h3 style="font:400 25px/1.28 Epilogue,sans-serif;margin:0;letter-spacing:-.018em">Come leggere la scala di difficoltà CAI</h3><div style="font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8);text-align:right">sara bonetti</div></div>
+</div>
+
+<div style="padding:0 56px 40px">
+<div style="display:flex;align-items:center;gap:16px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#3B5C4B">ULTIMI ITINERARI</span><span style="flex:1;height:1px;background:rgba(27,42,37,.2)"></span><span style="font:400 12.5px/1 Epilogue,sans-serif;color:#6E3A08">Tutti gli itinerari →</span></div>
+<div style="display:grid;grid-template-columns:96px minmax(0,1fr) 210px;gap:24px;padding:20px 0;border-bottom:1px solid rgba(27,42,37,.14);align-items:center"><div style="height:72px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(0deg,rgba(27,42,37,.07) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(27,42,37,.07) 0 1px,transparent 1px 22px)"></div><div style="display:flex;align-items:baseline;gap:14px"><h3 style="font:400 25px/1.28 Epilogue,sans-serif;margin:0;letter-spacing:-.018em">Gita al Rifugio Curò</h3><span style="font:500 12px/1 'IBM Plex Mono',monospace;color:#6E3A08;flex:none">E</span></div><div style="font:400 12.5px/1.85 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8);text-align:right">9,2 km · 850 m D+<br>3 h 30 · andata e ritorno</div></div>
+<div style="display:grid;grid-template-columns:96px minmax(0,1fr) 210px;gap:24px;padding:20px 0;align-items:center"><div style="height:72px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(0deg,rgba(27,42,37,.07) 0 1px,transparent 1px 22px),repeating-linear-gradient(90deg,rgba(27,42,37,.07) 0 1px,transparent 1px 22px)"></div><div style="display:flex;align-items:baseline;gap:14px"><h3 style="font:400 25px/1.28 Epilogue,sans-serif;margin:0;letter-spacing:-.018em">Rifugio Curò → Lago Gelt</h3><span style="font:500 12px/1 'IBM Plex Mono',monospace;color:#6E3A08;flex:none">E</span></div><div style="font:400 12.5px/1.85 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8);text-align:right">2,4 km · 180 m D+<br>1 h · traversata</div></div>
+</div>
+
+<div style="margin:0 56px;padding:22px 0;border-top:1px solid rgba(27,42,37,.2);display:flex;justify-content:space-between;font:400 12.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.8)"><span>Scaio della Montagna</span><span>Contatti</span></div>
+<div style="padding:0 56px 20px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.18em;color:#6E3A08">HOME · è anche l'about</div>
+</div>
+</div>
+
+<div class="dv-card" style="width:1000px;background:#F4EEE1;border-radius:10px">
+<div style="font-family:Epilogue,sans-serif;color:#1B2A25">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:26px 56px 22px;border-bottom:1px solid rgba(27,42,37,.2)">
+<div style="display:flex;gap:28px;font:400 13.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.82)"><span>Articoli</span><span style="color:#3B5C4B;font-weight:500;border-bottom:2px solid #6E3A08;padding-bottom:5px">Itinerari</span><span>Contatti</span></div>
+<span style="font:500 17px/1 Epilogue,sans-serif;letter-spacing:-.02em">Scaio della Montagna</span>
+</div>
+
+<div style="padding:40px 56px 34px">
+<div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;align-items:end">
+<h1 style="font:500 42px/1.16 Epilogue,sans-serif;margin:0;letter-spacing:-.028em">Itinerari</h1>
+<p style="font:400 15.5px/1.62 Epilogue,sans-serif;margin:0;color:rgba(27,42,37,.82)">Muovi i valori e l'elenco si aggiorna subito: i filtri lavorano nel browser.</p>
+</div>
+</div>
+
+<div style="background:#A9C1B0;padding:32px 56px 36px">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:26px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#6E3A08">FILTRI</span><span style="flex:1;height:1px;background:rgba(27,42,37,.22)"></span><span style="font:400 12.5px/1 Epilogue,sans-serif;color:#6E3A08">Azzera</span></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px">
+<div><div style="display:flex;justify-content:space-between;font:400 13px/1 'IBM Plex Mono',monospace;margin-bottom:14px"><span style="color:rgba(27,42,37,.82)">distanza</span><span>0 – 12 km</span></div><div style="height:2px;background:rgba(27,42,37,.22);position:relative"><span style="position:absolute;left:0;top:0;height:2px;width:60%;background:#3B5C4B"></span><span style="position:absolute;left:60%;top:-4px;width:10px;height:10px;border-radius:3px;background:#3B5C4B"></span></div></div>
+<div><div style="display:flex;justify-content:space-between;font:400 13px/1 'IBM Plex Mono',monospace;margin-bottom:14px"><span style="color:rgba(27,42,37,.82)">dislivello +</span><span>0 – 900 m</span></div><div style="height:2px;background:rgba(27,42,37,.22);position:relative"><span style="position:absolute;left:0;top:0;height:2px;width:45%;background:#3B5C4B"></span><span style="position:absolute;left:45%;top:-4px;width:10px;height:10px;border-radius:3px;background:#3B5C4B"></span></div></div>
+<div><div style="display:flex;justify-content:space-between;font:400 13px/1 'IBM Plex Mono',monospace;margin-bottom:14px"><span style="color:rgba(27,42,37,.82)">tempo medio</span><span>fino a 4 h</span></div><div style="height:2px;background:rgba(27,42,37,.22);position:relative"><span style="position:absolute;left:0;top:0;height:2px;width:50%;background:#3B5C4B"></span><span style="position:absolute;left:50%;top:-4px;width:10px;height:10px;border-radius:3px;background:#3B5C4B"></span></div></div>
+</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:36px;margin-top:34px;align-items:start">
+<div><div style="font:400 13px/1 'IBM Plex Mono',monospace;color:rgba(27,42,37,.82);margin-bottom:16px">difficoltà</div><div style="display:flex;gap:22px;font:400 14px/1 'IBM Plex Mono',monospace;color:rgba(27,42,37,.82)"><span>T</span><span style="color:#1B2A25;font-weight:500;border-bottom:2px solid #6E3A08;padding-bottom:5px">E</span><span>EE</span><span>EEA</span><span>OFA</span></div></div>
+<div style="grid-column:span 2"><div style="font:400 13px/1 'IBM Plex Mono',monospace;color:rgba(27,42,37,.82);margin-bottom:16px">caratteristiche</div><div style="display:flex;gap:24px;flex-wrap:wrap;font:400 13.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.82)"><span>Adatto ai bambini</span><span>Adatto in inverno</span><span>Ad anello</span><span>Vicino a me</span></div></div>
+</div>
+</div>
+
+<div style="padding:38px 56px 40px">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:6px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#3B5C4B">2 ITINERARI</span><span style="flex:1;height:1px;background:rgba(27,42,37,.2)"></span><span style="font:400 12.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.82)">Ordina per distanza</span></div>
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 200px;gap:28px;padding:24px 0;border-bottom:1px solid rgba(27,42,37,.14);align-items:start">
+<div style="height:112px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(0deg,rgba(27,42,37,.07) 0 1px,transparent 1px 26px),repeating-linear-gradient(90deg,rgba(27,42,37,.07) 0 1px,transparent 1px 26px)"></div>
+<div><div style="display:flex;align-items:baseline;gap:14px"><h3 style="font:400 27px/1.24 Epilogue,sans-serif;margin:0;letter-spacing:-.02em">Gita al Rifugio Curò</h3><span style="font:500 12px/1 'IBM Plex Mono',monospace;color:#6E3A08;flex:none">E</span></div><p style="font:400 14.5px/1.6 Epilogue,sans-serif;margin:12px 0 0;color:rgba(27,42,37,.82)">Salita classica dall'alta Val Seriana, sentiero ben segnalato su fondo misto.</p></div>
+<div style="font:400 12.5px/1.9 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8);text-align:right">9,2 km<br>850 m D+ · 850 m D−<br>3 h 30 · andata e ritorno</div>
+</div>
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 200px;gap:28px;padding:24px 0;align-items:start">
+<div style="height:112px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(0deg,rgba(27,42,37,.07) 0 1px,transparent 1px 26px),repeating-linear-gradient(90deg,rgba(27,42,37,.07) 0 1px,transparent 1px 26px)"></div>
+<div><div style="display:flex;align-items:baseline;gap:14px"><h3 style="font:400 27px/1.24 Epilogue,sans-serif;margin:0;letter-spacing:-.02em">Rifugio Curò → Lago Gelt</h3><span style="font:500 12px/1 'IBM Plex Mono',monospace;color:#6E3A08;flex:none">E</span></div><p style="font:400 14.5px/1.6 Epilogue,sans-serif;margin:12px 0 0;color:rgba(27,42,37,.82)">Prosecuzione naturale della salita, sentiero meno battuto con tratti su pietraia.</p></div>
+<div style="font:400 12.5px/1.9 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8);text-align:right">2,4 km<br>180 m D+ · 20 m D−<br>1 h · traversata</div>
+</div>
+</div>
+
+<div style="margin:0 56px;padding:22px 0;border-top:1px solid rgba(27,42,37,.2);display:flex;justify-content:space-between;font:400 12.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.8)"><span>Scaio della Montagna</span><span>Contatti</span></div>
+<div style="padding:0 56px 20px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.18em;color:#6E3A08">ITINERARI · miniature mappa 150×112</div>
+</div>
+</div>
+
+<div class="dv-card" style="width:1000px;background:#F4EEE1;border-radius:10px">
+<div style="font-family:Epilogue,sans-serif;color:#1B2A25">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:26px 56px 22px;border-bottom:1px solid rgba(27,42,37,.2)">
+<div style="display:flex;gap:28px;font:400 13.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.82)"><span>Articoli</span><span style="color:#3B5C4B;font-weight:500;border-bottom:2px solid #6E3A08;padding-bottom:5px">Itinerari</span><span>Contatti</span></div>
+<span style="font:500 17px/1 Epilogue,sans-serif;letter-spacing:-.02em">Scaio della Montagna</span>
+</div>
+
+<div style="padding:0 56px 40px">
+<div style="display:flex;align-items:center;gap:16px;padding-top:32px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#3B5C4B">ITINERARIO</span><span style="flex:1;height:1px;background:rgba(27,42,37,.2)"></span><span style="font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8)">michele curtaz</span></div>
+<div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;padding-top:32px;align-items:end">
+<h1 style="font:500 46px/1.14 Epilogue,sans-serif;margin:0;letter-spacing:-.03em">Gita al Rifugio Curò</h1>
+<div style="font:400 15px/1.6 Epilogue,sans-serif;color:rgba(27,42,37,.82)">Difficoltà <span style="color:#3B5C4B;font-weight:600">E — escursionistico</span>, andata e ritorno sullo stesso sentiero.</div>
+</div>
+</div>
+
+<div style="background:#A9C1B0;padding:34px 56px 38px">
+<div style="display:flex;align-items:center;gap:16px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#6E3A08">DATI</span><span style="flex:1;height:1px;background:rgba(27,42,37,.22)"></span></div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0 44px;padding-top:8px">
+<div style="display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(27,42,37,.18);font:400 13px/1 'IBM Plex Mono',monospace"><span style="color:rgba(27,42,37,.82)">distanza</span><span>9,2 km</span></div>
+<div style="display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(27,42,37,.18);font:400 13px/1 'IBM Plex Mono',monospace"><span style="color:rgba(27,42,37,.82)">dislivello +</span><span>850 m</span></div>
+<div style="display:flex;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(27,42,37,.18);font:400 13px/1 'IBM Plex Mono',monospace"><span style="color:rgba(27,42,37,.82)">dislivello −</span><span>850 m</span></div>
+<div style="display:flex;justify-content:space-between;padding:13px 0;font:400 13px/1 'IBM Plex Mono',monospace"><span style="color:rgba(27,42,37,.82)">tempo medio</span><span>3,5 h</span></div>
+<div style="display:flex;justify-content:space-between;padding:13px 0;font:400 13px/1 'IBM Plex Mono',monospace"><span style="color:rgba(27,42,37,.82)">partenza</span><span>46.0090, 9.9520</span></div>
+<div style="display:flex;justify-content:space-between;padding:13px 0;font:400 13px/1 'IBM Plex Mono',monospace"><span style="color:rgba(27,42,37,.82)">arrivo</span><span>stesso punto</span></div>
+</div>
+</div>
+
+<div style="padding:40px 56px">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:24px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#3B5C4B">TRACCIA</span><span style="flex:1;height:1px;background:rgba(27,42,37,.2)"></span><span style="font:400 12.5px/1 Epilogue,sans-serif;color:#6E3A08">Scarica GPX ↓</span></div>
+<div style="height:300px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(0deg,rgba(27,42,37,.06) 0 1px,transparent 1px 34px),repeating-linear-gradient(90deg,rgba(27,42,37,.06) 0 1px,transparent 1px 34px);display:flex;align-items:flex-end;padding:16px"><span style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:rgba(27,42,37,.8)">MAPPA STATICA</span></div>
+</div>
+
+<div style="padding:0 56px 40px">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:26px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#3B5C4B">DESCRIZIONE</span><span style="flex:1;height:1px;background:rgba(27,42,37,.2)"></span></div>
+<div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;align-items:start">
+<div>
+<p style="font:400 17.5px/1.72 Epilogue,sans-serif;margin:0 0 20px">Salita classica al Rifugio Curò, punto di appoggio per chi vuole proseguire verso i laghi dell'alta Val Seriana. Sentiero ben segnalato, fondo misto sterrato e mulattiera, un tratto finale più ripido negli ultimi tornanti prima del rifugio.</p>
+<p style="font:400 17.5px/1.72 Epilogue,sans-serif;margin:0">Si sale e si scende dallo stesso sentiero: nessun bivio significativo lungo il percorso.</p>
+</div>
+<div style="font:400 14px/1.75 Epilogue,sans-serif;color:rgba(27,42,37,.82);border-left:2px solid #6E3A08;padding-left:22px">Non adatto ai bambini.<br>Non adatto in inverno.<br>Non ad anello.</div>
+</div>
+</div>
+
+<div style="padding:0 56px 40px">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:24px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#3B5C4B">GALLERIA</span><span style="flex:1;height:1px;background:rgba(27,42,37,.2)"></span><span style="font:400 12.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.82)">4 immagini</span></div>
+<div style="height:260px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(135deg,rgba(27,42,37,.055) 0 7px,transparent 7px 14px)"></div>
+<div style="font:400 13px/1.5 Epilogue,sans-serif;color:rgba(27,42,37,.82);margin-top:12px">Vista sul rifugio dagli ultimi tornanti</div>
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:24px">
+<div><div style="aspect-ratio:3/2;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(135deg,rgba(27,42,37,.055) 0 7px,transparent 7px 14px)"></div><div style="font:400 12.5px/1.5 Epilogue,sans-serif;color:rgba(27,42,37,.82);margin-top:11px">Didascalia immagine</div></div>
+<div><div style="aspect-ratio:3/2;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(135deg,rgba(27,42,37,.055) 0 7px,transparent 7px 14px)"></div><div style="font:400 12.5px/1.5 Epilogue,sans-serif;color:rgba(27,42,37,.82);margin-top:11px">Didascalia immagine</div></div>
+<div><div style="aspect-ratio:3/2;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(135deg,rgba(27,42,37,.055) 0 7px,transparent 7px 14px)"></div><div style="font:400 12.5px/1.5 Epilogue,sans-serif;color:rgba(27,42,37,.82);margin-top:11px">Didascalia immagine</div></div>
+</div>
+</div>
+
+<div style="padding:0 56px 40px">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:24px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#3B5C4B">SI COLLEGA CON</span><span style="flex:1;height:1px;background:rgba(27,42,37,.2)"></span><span style="font:500 11.5px/1 'IBM Plex Mono',monospace;letter-spacing:.1em;color:#6E3A08">PROSECUZIONE</span></div>
+<div style="display:grid;grid-template-columns:150px minmax(0,1fr) 200px;gap:28px;align-items:center">
+<div style="height:96px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(0deg,rgba(27,42,37,.07) 0 1px,transparent 1px 24px),repeating-linear-gradient(90deg,rgba(27,42,37,.07) 0 1px,transparent 1px 24px)"></div>
+<div style="display:flex;align-items:baseline;gap:14px"><h3 style="font:400 27px/1.24 Epilogue,sans-serif;margin:0;letter-spacing:-.02em">Rifugio Curò → Lago Gelt</h3><span style="font:500 12px/1 'IBM Plex Mono',monospace;color:#6E3A08;flex:none">E</span></div>
+<div style="font:400 12.5px/1.9 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8);text-align:right">2,4 km<br>180 m D+ · 1 h<br>traversata</div>
+</div>
+</div>
+
+<div style="margin:0 56px;padding:22px 0;border-top:1px solid rgba(27,42,37,.2);display:flex;justify-content:space-between;font:400 12.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.8)"><span>Scaio della Montagna</span><span>Contatti</span></div>
+<div style="padding:0 56px 20px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.18em;color:#6E3A08">ITINERARIO · galleria a griglia</div>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+
+</section>
+
+<section class="dv-turn" id="t2">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Articoli e Articolo — stesso modello</span></div>
+<p class="dv-note">Le due pagine mancanti, con le stesse regole: navbar con link a sinistra e titolo a destra, etichette sul filetto, griglia 1,5 / 1, una fascia salvia per pagina, lista con miniature. L'elenco articoli non ha filtri — senza categorie né tag non c'è nulla da filtrare, solo l'ordine di pubblicazione.</p>
+<div class="dv-opts" style="flex-direction:column;gap:44px">
+
+<div class="dv-opt" id="2a">
+<div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a><strong style="font-weight:600;color:rgba(0,0,0,.75)">Articoli</strong> e <strong style="font-weight:600;color:rgba(0,0,0,.75)">Articolo singolo</strong></div>
+<div style="display:flex;gap:24px;align-items:flex-start">
+
+<div class="dv-card" style="width:1000px;background:#F4EEE1;border-radius:10px">
+<div style="font-family:Epilogue,sans-serif;color:#1B2A25">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:26px 56px 22px;border-bottom:1px solid rgba(27,42,37,.2)">
+<div style="display:flex;gap:28px;font:400 13.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.82)"><span style="color:#3B5C4B;font-weight:500;border-bottom:2px solid #6E3A08;padding-bottom:5px">Articoli</span><span>Itinerari</span><span>Contatti</span></div>
+<span style="font:500 17px/1 Epilogue,sans-serif;letter-spacing:-.02em">Scaio della Montagna</span>
+</div>
+
+<div style="background:#A9C1B0;padding:40px 56px 44px">
+<div style="display:flex;align-items:center;gap:16px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#6E3A08">ARTICOLI</span><span style="flex:1;height:1px;background:rgba(27,42,37,.22)"></span><span style="font:400 12.5px/1 'IBM Plex Mono',monospace;color:rgba(27,42,37,.82)">2 pubblicati</span></div>
+<div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;padding-top:30px;align-items:end">
+<h1 style="font:500 42px/1.16 Epilogue,sans-serif;margin:0;letter-spacing:-.028em">Appunti di montagna</h1>
+<p style="font:400 15.5px/1.62 Epilogue,sans-serif;margin:0;color:rgba(27,42,37,.82)">Attrezzatura, lettura della difficoltà, cose imparate sbagliando. In ordine di pubblicazione.</p>
+</div>
+</div>
+
+<div style="padding:38px 56px 40px">
+<div style="display:grid;grid-template-columns:180px minmax(0,1fr) 150px;gap:28px;padding-bottom:26px;border-bottom:1px solid rgba(27,42,37,.14);align-items:start">
+<div style="height:126px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(135deg,rgba(27,42,37,.06) 0 7px,transparent 7px 14px)"></div>
+<div><h3 style="font:400 28px/1.24 Epilogue,sans-serif;margin:0;letter-spacing:-.02em">Cosa mettere nello zaino per un'escursione di giornata</h3><p style="font:400 14.5px/1.6 Epilogue,sans-serif;margin:12px 0 0;color:rgba(27,42,37,.82)">Acqua, strati, scarpe con suola scolpita e la traccia GPX scaricata offline: la checklist minima e cosa si dimentica più spesso.</p></div>
+<div style="font:400 12.5px/1.9 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8);text-align:right">michele curtaz<br>2 set 2026</div>
+</div>
+<div style="display:grid;grid-template-columns:180px minmax(0,1fr) 150px;gap:28px;padding:26px 0 0;align-items:start">
+<div style="height:126px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(135deg,rgba(27,42,37,.06) 0 7px,transparent 7px 14px)"></div>
+<div><h3 style="font:400 28px/1.24 Epilogue,sans-serif;margin:0;letter-spacing:-.02em">Come leggere la scala di difficoltà CAI</h3><p style="font:400 14.5px/1.6 Epilogue,sans-serif;margin:12px 0 0;color:rgba(27,42,37,.82)">T, E, EE, EEA, OFA: cosa vogliono dire davvero e perché la sigla descrive il tratto più impegnativo, non la media del percorso.</p></div>
+<div style="font:400 12.5px/1.9 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8);text-align:right">sara bonetti<br>24 ago 2026</div>
+</div>
+</div>
+
+<div style="margin:0 56px;padding:22px 0;border-top:1px solid rgba(27,42,37,.2);display:flex;justify-content:space-between;font:400 12.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.8)"><span>Scaio della Montagna</span><span>Contatti</span></div>
+<div style="padding:0 56px 20px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.18em;color:#6E3A08">ARTICOLI · nessun filtro, solo ordine di pubblicazione</div>
+</div>
+</div>
+
+<div class="dv-card" style="width:1000px;background:#F4EEE1;border-radius:10px">
+<div style="font-family:Epilogue,sans-serif;color:#1B2A25">
+<div style="display:flex;align-items:baseline;justify-content:space-between;padding:26px 56px 22px;border-bottom:1px solid rgba(27,42,37,.2)">
+<div style="display:flex;gap:28px;font:400 13.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.82)"><span style="color:#3B5C4B;font-weight:500;border-bottom:2px solid #6E3A08;padding-bottom:5px">Articoli</span><span>Itinerari</span><span>Contatti</span></div>
+<span style="font:500 17px/1 Epilogue,sans-serif;letter-spacing:-.02em">Scaio della Montagna</span>
+</div>
+
+<div style="padding:0 56px 36px">
+<div style="display:flex;align-items:center;gap:16px;padding-top:32px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#3B5C4B">ARTICOLO</span><span style="flex:1;height:1px;background:rgba(27,42,37,.2)"></span><span style="font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,42,37,.8)">michele curtaz · 2 set 2026</span></div>
+<div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;padding-top:32px;align-items:end">
+<h1 style="font:500 44px/1.15 Epilogue,sans-serif;margin:0;letter-spacing:-.03em">Cosa mettere nello zaino per un'escursione di giornata</h1>
+<p style="font:400 15.5px/1.62 Epilogue,sans-serif;margin:0;color:rgba(27,42,37,.82)">La checklist minima prima di partire, e le tre cose che si dimenticano più spesso.</p>
+</div>
+</div>
+
+<div style="padding:0 56px 40px">
+<div style="height:320px;border-radius:8px;background:#DCD9C6;background-image:repeating-linear-gradient(135deg,rgba(27,42,37,.055) 0 7px,transparent 7px 14px);display:flex;align-items:flex-end;padding:16px"><span style="font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:rgba(27,42,37,.8)">IMMAGINE DI COPERTINA</span></div>
+</div>
+
+<div style="padding:0 56px 40px">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:26px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#3B5C4B">TESTO</span><span style="flex:1;height:1px;background:rgba(27,42,37,.2)"></span></div>
+<div style="display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:48px;align-items:start">
+<div>
+<p style="font:400 17.5px/1.72 Epilogue,sans-serif;margin:0 0 20px">Uno zaino da giornata si riempie in fretta di cose che non useremo. La regola che seguo è semplice: acqua per tutta l'uscita, uno strato in più di quello che serve alla partenza, e la traccia scaricata offline prima di perdere campo.</p>
+<h2 style="font:500 24px/1.3 Epilogue,sans-serif;margin:0 0 14px;letter-spacing:-.02em">Acqua e cibo</h2>
+<p style="font:400 17.5px/1.72 Epilogue,sans-serif;margin:0 0 20px">Un litro e mezzo per un'uscita di quattro ore, due se la giornata è calda e non ci sono fontane sul percorso. Il cibo conta meno di quanto si pensi, ma qualcosa di salato in tasca cambia il rientro.</p>
+<h2 style="font:500 24px/1.3 Epilogue,sans-serif;margin:0 0 14px;letter-spacing:-.02em">Strati</h2>
+<p style="font:400 17.5px/1.72 Epilogue,sans-serif;margin:0">In quota il vento cambia tutto: un guscio leggero pesa poco e resta nello zaino nove volte su dieci. La decima giustifica le altre nove.</p>
+</div>
+<div style="font:400 13px/1.9 'IBM Plex Mono',monospace;color:rgba(27,42,37,.82);border-left:2px solid #6E3A08;padding-left:22px">acqua · 1,5 l<br>strati · 3<br>frontalino · sì<br>gpx offline · sì</div>
+</div>
+</div>
+
+<div style="background:#A9C1B0;padding:34px 56px 38px">
+<div style="display:flex;align-items:center;gap:16px;margin-bottom:24px"><span style="font:500 10.5px/1 'IBM Plex Mono',monospace;letter-spacing:.16em;color:#6E3A08">ALTRI ARTICOLI</span><span style="flex:1;height:1px;background:rgba(27,42,37,.22)"></span><span style="font:400 12.5px/1 Epilogue,sans-serif;color:#6E3A08">Tutti gli articoli →</span></div>
+<div style="display:grid;grid-template-columns:96px minmax(0,1fr) 150px;gap:24px;align-items:center">
+<div style="height:72px;border-radius:8px;background:rgba(27,42,37,.1);background-image:repeating-linear-gradient(135deg,rgba(27,42,37,.06) 0 6px,transparent 6px 12px)"></div>
+<h3 style="font:400 25px/1.28 Epilogue,sans-serif;margin:0;letter-spacing:-.018em">Come leggere la scala di difficoltà CAI</h3>
+<div style="font:400 12px/1 'IBM Plex Mono',monospace;color:rgba(27,42,37,.82);text-align:right">sara bonetti</div>
+</div>
+</div>
+
+<div style="margin:0 56px;padding:22px 0;border-top:1px solid rgba(27,42,37,.2);display:flex;justify-content:space-between;font:400 12.5px/1 Epilogue,sans-serif;color:rgba(27,42,37,.8)"><span>Scaio della Montagna</span><span>Contatti</span></div>
+<div style="padding:0 56px 20px;font:500 10px/1 'IBM Plex Mono',monospace;letter-spacing:.18em;color:#6E3A08">ARTICOLO</div>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>
