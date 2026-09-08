@@ -22,3 +22,15 @@
 body {
   @apply bg-crema text-inchiostro font-display;
 }
+
+.media-placeholder {
+  @apply bg-pietra rounded-lg;
+}
+.media-placeholder-diagonal {
+  background-image: repeating-linear-gradient(135deg, rgb(27 42 37 / 0.06) 0 6px, transparent 6px 12px);
+}
+.media-placeholder-grid {
+  background-image:
+    repeating-linear-gradient(0deg, rgb(27 42 37 / 0.07) 0 1px, transparent 1px 22px),
+    repeating-linear-gradient(90deg, rgb(27 42 37 / 0.07) 0 1px, transparent 1px 22px);
+}

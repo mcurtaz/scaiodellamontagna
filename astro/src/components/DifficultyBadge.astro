@@ -1,0 +1,14 @@
+---
+import { DIFFICOLTA_LABELS } from "../lib/difficolta";
+
+interface Props {
+  level: "T" | "E" | "EE" | "EEA" | "OFA";
+  withLabel?: boolean;
+}
+
+const { level, withLabel = false } = Astro.props;
+---
+
+<span class="font-mono-data font-medium text-terra">
+  {level}{withLabel && ` — ${DIFFICOLTA_LABELS[level]}`}
+</span>
