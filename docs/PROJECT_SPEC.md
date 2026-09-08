@@ -62,9 +62,46 @@ Instead:
 - A Directus Flow on the junction collection rejects a row where the two linked routes are the same record.
 - Extending a chain further (lago → passo → ...) costs one new independent record + one new link each time — no cumulative recalculation, no combinatorial complexity.
 
-### Map rendering (decide later, two options on the table)
-- **Static-first (preferred direction for v1)**: render a map image (track + start/end markers) at build time and ship it as a plain `<img>` — keeps the route page fully static, no client-side map JS.
-- **Interactive**: client-side Leaflet + OpenStreetMap tiles, loading the GPX live. More flexible (zoom/pan) but adds JS and a runtime dependency on tile servers.
+### Map rendering
+
+**Decided: static image**, not interactive. A map image (track + start/end
+markers) gets rendered once and shipped as a plain `<img>` — keeps the route
+page fully static, no client-side map JS/tile-server runtime dependency,
+consistent with the "static as possible" goal. (Ruled out: client-side
+Leaflet + OpenStreetMap tiles loading the GPX live — more flexible pan/zoom,
+but not worth the added JS/runtime dependency for a personal blog rather than
+a route-planning tool.)
+
+**Open — how/when the image gets generated (research pending: map/static-tile
+API costs and rate limits)**:
+- Leading candidate: don't render inside the Astro build at all (that would
+  mean regenerating every route's map on every `npm run build`, even for
+  routes whose GPX never changed — wasteful, and costly/rate-limited if the
+  renderer is a paid API). Instead, generate **once, on the Directus side**,
+  triggered by a Directus Flow when `traccia_gpx` is uploaded/changed, and
+  store the result as a new file field on `itinerari` (e.g.
+  `mappa_statica`). The Astro build then just fetches that field like any
+  other image asset — no rendering logic in the frontend build at all.
+- Still to research before committing: which rendering approach/provider —
+  a paid static-map API (e.g. Mapbox Static Images, Geoapify, Stadia Maps,
+  Thunderforest) vs. self-hosted rendering (e.g. a script using an
+  open-tile-based static-map library) — and what that costs/how it rate-limits
+  at this project's volume (tens of routes/year, so low absolute request
+  count, but worth checking per-request pricing and any free-tier caps).
+
+### Elevation profile ("profilo altimetrico") image
+
+**New idea, open — research pending.** In addition to the static map, also
+generate an elevation-profile chart image (distance on the x-axis, elevation
+on the y-axis) derived from the same GPX track's elevation points, and show
+it alongside the map on the Itinerario detail page's track section.
+
+Likely follows the same generation shape as the static map above — derived
+from `traccia_gpx`, generated once rather than at every build, stored as
+another file field on `itinerari` (e.g. `profilo_altimetrico`) — possibly via
+the same Directus Flow triggered on GPX upload, or a separate one. Not
+decided: the actual charting approach/library, and whether it shares a Flow
+with the map generation or runs independently.
 
 ## Search
 
@@ -90,12 +127,58 @@ Goal: automated deploy triggered by content changes.
 - **Fallback (simpler, keeps project easy to reason about)**: manual rebuild trigger.
 - Decide the exact webhook target (CI job, build server, etc.) once hosting is set up.
 
-## Infrastructure (future discussion, notes only — not decided)
+## Infrastructure (direction researched, not yet implemented — current local setup still runs `STORAGE_LOCATIONS: local` per `docker-compose.yml`)
 
 - Direction: containers on a single EC2 instance (Directus + Postgres via docker-compose, as already started locally) rather than a separate managed RDS instance — avoids the cost/complexity of a second managed service for a personal project.
 - Also planned: Route53, S3, CloudFront for static asset hosting/CDN in front of the Astro output.
+
+### Directus file storage — S3
+
+Directus's storage layer is pluggable (local/S3/GCS/Azure/Cloudinary/Supabase
+drivers) — switching from the current local-filesystem storage to S3 is an
+env-var change, no schema or code change:
+
+```yaml
+STORAGE_LOCATIONS: s3
+STORAGE_S3_DRIVER: s3
+STORAGE_S3_KEY: ${AWS_ACCESS_KEY_ID}
+STORAGE_S3_SECRET: ${AWS_SECRET_ACCESS_KEY}
+STORAGE_S3_BUCKET: scaio-uploads
+STORAGE_S3_REGION: <region>
+STORAGE_S3_ACL: private   # keep private, serve through Directus/CloudFront, not direct S3 URLs
+```
+
+Existing locally-uploaded files would need a one-time copy into the bucket
+(Directus stores just the file id in the DB, not the storage path, so this
+is a file copy, not a data migration).
+
+### Directus caching (two independent caches, both relevant even before CDN)
+
+- **Data cache**: caches API query results (`CACHE_ENABLED`,
+  `CACHE_STORE=memory|redis`), auto-invalidated on writes. `memory` is
+  sufficient for a single instance; `redis` only matters if ever running more
+  than one Directus instance.
+- **Asset cache** (the one that matters for images): the first request for a
+  given `/assets/{id}?width=...&quality=...` transform gets generated once
+  and cached (`ASSETS_CACHE_TTL`); every later request for that exact same
+  URL is served from cache instead of re-processing the image. This is what
+  makes the "plain `<img>` with query-string resizing" decision cheap even
+  without a CDN in front of it.
+
+### CDN — CloudFront in front of Directus, not directly in front of S3
+
+Because the resize-via-query-param decision (`?width=...&quality=...`
+handled by Directus) only works through Directus's `/assets` endpoint,
+CloudFront should sit in front of **Directus** (the EC2 app), not directly in
+front of the S3 bucket. Pointing CloudFront straight at S3 would serve only
+original, unprocessed files and lose the on-the-fly resize. With CloudFront
+→ Directus: the first request for a given size hits Directus (which caches
+the transform per the asset cache above), and CloudFront then caches that
+full response (including query string) at the edge — later requests for the
+same size, from anywhere, never touch the EC2 box again.
+
 - **Backups are a hard requirement, schedule/retention TBD**: both the Postgres database (e.g. scheduled `pg_dump` to S3) and uploaded files (Directus uploads folder / S3 storage) need a backup strategy before going to production.
-- Full production architecture to be revisited in a dedicated discussion.
+- Full production architecture (EC2 sizing, DNS/TLS, exact deploy pipeline) to be revisited in a dedicated discussion.
 
 ## Analytics (future discussion, not decided)
 
@@ -106,7 +189,13 @@ Goal: automated deploy triggered by content changes.
 - Autori page: unhide and design listing (later).
 - Auto-suggested related routes (later, if manual curation proves limiting).
 - Articolo ↔ Itinerario cross-linking (later, if useful).
-- Interactive vs static map rendering: final call pending.
+- Static map generation mechanism (Directus Flow + rendering provider):
+  researching map/static-tile API costs before committing — see "Map
+  rendering" above.
+- Elevation profile ("profilo altimetrico") image: new idea, researching
+  charting approach before committing — see "Elevation profile" above.
 - Backup schedule/retention specifics.
-- Production infra details (EC2 sizing, CloudFront config, DNS, TLS).
+- Production infra details (EC2 sizing, CloudFront config, DNS, TLS) — S3
+  storage + CloudFront-in-front-of-Directus is the researched direction (see
+  "Infrastructure" above), exact rollout still to happen.
 - Umami setup and metrics of interest.

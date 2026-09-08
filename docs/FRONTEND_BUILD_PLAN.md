@@ -23,13 +23,18 @@ Inspected directly against the local instance (read-only API token) so
 component props are grounded in real field names, not guesses:
 
 - **itinerari**: `titolo`, `slug`, `dislivello_positivo`, `dislivello_negativo`,
-  `tempo_medio_ore`, `distanza_km`, `difficolta` (`T`/`E`/`EE`/`EEA`/`OFA`),
+  `tempo_medio_ore` (decimal, comes back from the API as a `string`),
+  `distanza_km` (decimal, also a `string`), `difficolta` (`T`/`E`/`EE`/`EEA`/`OFA`),
   `is_child_friendly`, `is_winter_friendly`, `is_loop`, `punto_partenza` /
   `punto_arrivo` (GeoJSON Point), `traccia_gpx` (file id), `descrizione`,
-  `galleria_immagini` (field exists; exact shape not yet inspected),
-  `autore` (m2o → autori). The `itinerari_correlati` junction exists in the
-  schema but the read-only API token currently has no permission on it —
-  needs a permissions check when we get to that piece.
+  `autore` (m2o → autori). Two m2m relations, re-verified against the live
+  instance (field names corrected from an earlier draft of this doc):
+  `galleria` (→ `directus_files`, junction collection `itinerari_galleria`
+  with `directus_files_id`, `sort`, `didascalia` caption) and `correlati`
+  (self-referencing, junction collection `itinerari_correlati` with
+  `itinerario_correlato`, `tipo`). **Both junction collections currently have
+  zero permission rows for the API Reader policy** — needs a permissions fix
+  before Step 9 can fetch either.
 - **articoli**: `titolo`, `slug`, `immagine` (file id), `testo` (markdown),
   `autore` (m2o → autori).
 - **autori**: `nome`, `bio`, `foto` (file id).
@@ -50,9 +55,11 @@ component props are grounded in real field names, not guesses:
    Astro island library gets introduced for this.
 6. **Responsiveness**: mobile-first, designed for real (not just "doesn't
    break") from the very first component.
-7. **Map rendering** (static image vs. interactive Leaflet): left open per
-   `PROJECT_SPEC.md`. Not a blocker for anything except the last piece
-   (Itinerario detail's track section) — decide right before that piece.
+7. **Map rendering**: static image — a track + start/end markers rendered to
+   a plain `<img>` at build time, no client-side map JS/tile-server runtime
+   dependency. Only affects the last piece (Itinerario detail's track
+   section, Step 9); the "decide right before that piece" placeholder from
+   `PROJECT_SPEC.md` is resolved.
 
 ## Design tokens
 
@@ -106,7 +113,7 @@ Fonts: **Epilogue** (body/display, weights 400/500/600) and **IBM Plex Mono**
 
 ## Build order
 
-Detailed, executable specs exist for steps 1–4 (see below); later steps stay
+Detailed, executable specs exist for steps 1–5 (see below); later steps stay
 at the strategy level until we get there.
 
 1. **Design tokens + fonts** → `docs/FRONTEND_STEP_1_TOKENS.md`
@@ -115,7 +122,8 @@ at the strategy level until we get there.
    `docs/FRONTEND_STEP_3_ATOMS.md`
 4. **Home page, hardcoded content** → `docs/FRONTEND_STEP_4_HOME_STATIC.md`
 5. **Wire Home to Directus** (`@directus/sdk`, `src/lib/directus.ts`) —
-   proves the data-fetching architecture on the lowest-risk page.
+   proves the data-fetching architecture on the lowest-risk page →
+   `docs/FRONTEND_STEP_5_DIRECTUS_WIRING.md`
 6. **Articoli listing + Articolo detail**, wired to Directus immediately
    (pattern already proven in step 5).
 7. **Itinerari listing**, static/non-interactive filters first.
