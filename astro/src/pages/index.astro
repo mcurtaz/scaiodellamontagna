@@ -1,20 +1,68 @@
 ---
-import '../styles/global.css';
+import Layout from "../layouts/Layout.astro";
+import SageBand from "../components/SageBand.astro";
+import SectionHeader from "../components/SectionHeader.astro";
+import PageHeader from "../components/PageHeader.astro";
+import ArticleListItem from "../components/ArticleListItem.astro";
+import RouteListItem from "../components/RouteListItem.astro";
+import { CONTACT_EMAIL } from "../lib/site";
 ---
 
-<html lang="it">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Scaio della Montagna</title>
-	</head>
-	<body>
-		<div class="bg-salvia text-terra font-mono-data p-4">
-			<h1 class="text-3xl font-display font-semibold text-inchiostro">Scaio della Montagna</h1>
-			<p>Design tokens smoke test — bg-salvia text-terra font-mono-data</p>
-		</div>
-	</body>
-</html>
+<Layout title="Scaio della Montagna">
+  <SageBand>
+    <SectionHeader label="IL SITO" tone="onSage" />
+    <div class="mt-8">
+      <PageHeader title="Un archivio personale di uscite in montagna, camminate e misurate sul posto.">
+        <p class="text-inchiostro/82">
+          Ogni itinerario nasce da una traccia GPX registrata durante l'uscita. Gli
+          articoli sono appunti sparsi: attrezzatura, letture della difficoltà, cose
+          imparate sbagliando.
+        </p>
+        <p class="font-mono-data text-sm text-inchiostro/82 mt-5">
+          itinerari · 2 &nbsp; articoli · 2<br />
+          zona · orobie &nbsp; contatti · <a href={`mailto:${CONTACT_EMAIL}`} class="hover:text-terra">email</a>
+        </p>
+      </PageHeader>
+    </div>
+  </SageBand>
+
+  <section class="px-4 py-8 sm:px-8 md:px-14">
+    <SectionHeader label="ULTIMI ARTICOLI" action={{ label: "Tutti gli articoli →", href: "/articoli" }} />
+    <div class="divide-y divide-inchiostro/14">
+      <ArticleListItem
+        title="Cosa mettere nello zaino per un'escursione di giornata"
+        href="/articoli/cosa-mettere-nello-zaino"
+        author="michele curtaz"
+      />
+      <ArticleListItem
+        title="Come leggere la scala di difficoltà CAI"
+        href="/articoli/scala-difficolta-cai"
+        author="sara bonetti"
+      />
+    </div>
+  </section>
+
+  <section class="px-4 pb-8 sm:px-8 md:px-14">
+    <SectionHeader label="ULTIMI ITINERARI" action={{ label: "Tutti gli itinerari →", href: "/itinerari" }} />
+    <div class="divide-y divide-inchiostro/14">
+      <RouteListItem
+        title="Gita al Rifugio Curò"
+        href="/itinerari/gita-al-rifugio-curo"
+        difficulty="E"
+        distanceKm={9.2}
+        elevationGainM={850}
+        timeLabel="3 h 30"
+        typeLabel="andata e ritorno"
+      />
+      <RouteListItem
+        title="Da Rifugio Curò a Lago Gelt"
+        href="/itinerari/rifugio-curo-lago-gelt"
+        difficulty="E"
+        distanceKm={2.4}
+        elevationGainM={180}
+        timeLabel="1 h"
+        typeLabel="traversata"
+      />
+    </div>
+  </section>
+</Layout>
