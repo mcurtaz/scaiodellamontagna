@@ -1,5 +1,5 @@
 ---
-import { SITE_NAME, CONTACT_EMAIL } from "../lib/site";
+import { SITE_NAME } from "../lib/site";
 
 interface Props {
   active?: "articoli" | "itinerari";
@@ -10,7 +10,6 @@ const { active } = Astro.props;
 const links = [
   { key: "articoli", label: "Articoli", href: "/articoli" },
   { key: "itinerari", label: "Itinerari", href: "/itinerari" },
-  { key: "contatti", label: "Contatti", href: `mailto:${CONTACT_EMAIL}` },
 ] as const;
 ---
 
