@@ -14,6 +14,15 @@ marker on the map, and vice versa. This reverses `PROJECT_SPEC.md`'s original "s
 image, not interactive" decision for the map, in exchange for zero new backend
 infrastructure and a materially better track-exploration UX.
 
+## Attribution requirement (handled automatically here)
+
+Using MapTiler's map data/styles requires visibly crediting them (their ToS's attribution
+clause) — this is the same category of legal requirement as OpenStreetMap's own attribution
+condition in Plan A, just for a different provider. Unlike Plan A's static image, though,
+this is essentially a non-issue here: MapLibre GL JS/the MapTiler SDK render a small
+attribution control in the map's corner automatically, on by default. No implementation
+work needed — just don't remove or hide that control.
+
 ## Comparison with Plan A
 
 | Dimension | Plan A (static) | Plan B (this plan) |

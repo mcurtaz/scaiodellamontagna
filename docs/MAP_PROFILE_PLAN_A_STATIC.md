@@ -13,6 +13,26 @@ file fields. The Astro frontend never renders a map or chart itself: both images
 `<img>` tags, fetched like any other Directus asset. This matches `PROJECT_SPEC.md`'s
 original "static as possible" decision and its "leading candidate" generation mechanism.
 
+## ⚠️ Legal requirement: OpenStreetMap attribution
+
+The static map is rendered from OpenStreetMap map data. OSM's license (ODbL) and tile
+usage policy **require** every map built from their data — static or interactive — to
+visibly credit "© OpenStreetMap contributors" (linking to
+`openstreetmap.org/copyright` where a link is feasible). This is not about crediting
+whichever library draws the image (`staticmap`/`py-staticmaps`) — nobody cares about that —
+it's a licensing condition on the underlying map data itself.
+
+The reason this needs calling out explicitly for **this plan specifically**: an interactive
+map library (MapLibre/MapTiler, as in Plan B) shows this automatically via a built-in
+attribution control, so it's easy to take for granted. A static PNG has no such control —
+the credit text has to be **composited onto the image itself** (e.g. a few lines of Pillow
+drawing "© OpenStreetMap contributors" in a corner before saving), or it's simply missing
+and the site is out of compliance with OSM's usage terms. This is easy to forget because a
+"clean" rendered map without it looks perfectly fine — the omission isn't visually obvious.
+
+**Action item**: this must be verified as present on every generated map PNG before this
+plan ships — see the Implementation steps below.
+
 ## Comparison with Plan B
 
 | Dimension | Plan A (this plan) | Plan B (interactive) |
@@ -115,6 +135,10 @@ ever generated per route.
    `DIRECTUS_SETUP.md`.
 6. Update `lib/directus.ts` queries, `MapThumbnail.astro`, add `ElevationProfile.astro`,
    wire both into the detail page and the list item component.
+7. **Verify OSM attribution text is actually present on every generated map PNG** (see the
+   "Legal requirement" section above) before treating this plan as done — check whether
+   `staticmap`/`py-staticmaps` add it automatically, and if not, add it explicitly via
+   Pillow as part of the render step.
 
 No backfill step needed — the site isn't live yet, so there's no existing content with a
 `traccia_gpx` predating the Flow. (If content does get added to Directus before this ships,
