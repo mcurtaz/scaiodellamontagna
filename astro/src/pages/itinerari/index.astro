@@ -1,0 +1,193 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SageBand from "../../components/SageBand.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import RouteListItem from "../../components/RouteListItem.astro";
+import FilterPanel from "../../components/FilterPanel.astro";
+import { getItinerari } from "../../lib/directus";
+import { formatTimeLabel, getTypeLabel, formatExcerpt } from "../../lib/format";
+
+const itinerari = await getItinerari();
+
+const maxDistanzaKm = Math.ceil(Math.max(...itinerari.map((r) => Number(r.distanza_km))));
+const maxDislivelloM = Math.ceil(Math.max(...itinerari.map((r) => r.dislivello_positivo)) / 50) * 50;
+const maxTempoOre = Math.ceil(Math.max(...itinerari.map((r) => Number(r.tempo_medio_ore))));
+
+const countLabel = `${itinerari.length} ${itinerari.length === 1 ? "ITINERARIO" : "ITINERARI"}`;
+---
+
+<Layout title="Itinerari" active="itinerari">
+  <div class="px-4 pt-8 sm:px-8 md:px-14">
+    <PageHeader title="Itinerari">
+      <p class="text-inchiostro/82">
+        Muovi i valori e l'elenco si aggiorna subito: i filtri lavorano nel browser.
+      </p>
+    </PageHeader>
+  </div>
+
+  <SageBand>
+    <FilterPanel maxDistanzaKm={maxDistanzaKm} maxDislivelloM={maxDislivelloM} maxTempoOre={maxTempoOre} />
+  </SageBand>
+
+  <section class="px-4 py-8 sm:px-8 md:px-14">
+    <div class="flex flex-wrap items-center gap-3">
+      <span id="itinerari-count" class="font-mono-data text-xs tracking-widest uppercase text-verde">{countLabel}</span>
+      <span class="flex-1 h-px bg-inchiostro/20 min-w-6"></span>
+      <label class="font-mono-data text-xs text-inchiostro/82">
+        Ordina per
+        <select id="itinerari-sort" class="ml-1 bg-transparent underline">
+          <option value="distanza">distanza</option>
+          <option value="dislivello">dislivello +</option>
+          <option value="tempo">tempo medio</option>
+        </select>
+      </label>
+    </div>
+
+    <div id="itinerari-list" class="mt-6 divide-y divide-inchiostro/14">
+      {itinerari.map((r) => (
+        <div
+          data-itinerario
+          data-distanza={r.distanza_km}
+          data-dislivello={r.dislivello_positivo}
+          data-tempo={r.tempo_medio_ore}
+          data-difficolta={r.difficolta}
+          data-bambini={r.is_child_friendly}
+          data-inverno={r.is_winter_friendly}
+          data-anello={r.is_loop}
+          data-lat={r.punto_partenza.coordinates[1]}
+          data-lon={r.punto_partenza.coordinates[0]}
+        >
+          <RouteListItem
+            title={r.titolo}
+            href={`/itinerari/${r.slug}`}
+            difficulty={r.difficolta}
+            distanceKm={Number(r.distanza_km)}
+            elevationGainM={r.dislivello_positivo}
+            elevationLossM={r.dislivello_negativo}
+            timeLabel={formatTimeLabel(r.tempo_medio_ore)}
+            typeLabel={getTypeLabel(r)}
+            excerpt={formatExcerpt(r.descrizione)}
+          />
+        </div>
+      ))}
+    </div>
+  </section>
+</Layout>
+
+<script>
+  const list = document.getElementById("itinerari-list")!;
+  const rows = Array.from(list.querySelectorAll<HTMLElement>("[data-itinerario]"));
+  const countEl = document.getElementById("itinerari-count")!;
+
+  const distanza = document.getElementById("filtro-distanza") as HTMLInputElement;
+  const dislivello = document.getElementById("filtro-dislivello") as HTMLInputElement;
+  const tempo = document.getElementById("filtro-tempo") as HTMLInputElement;
+  const distanzaLabel = document.getElementById("distanza-value")!;
+  const dislivelloLabel = document.getElementById("dislivello-value")!;
+  const tempoLabel = document.getElementById("tempo-value")!;
+  const bambini = document.getElementById("filtro-bambini") as HTMLInputElement;
+  const inverno = document.getElementById("filtro-inverno") as HTMLInputElement;
+  const anello = document.getElementById("filtro-anello") as HTMLInputElement;
+  const vicino = document.getElementById("filtro-vicino") as HTMLInputElement;
+  const difficoltaBoxes = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="difficolta"]'));
+  const azzera = document.getElementById("filtri-azzera")!;
+  const sort = document.getElementById("itinerari-sort") as HTMLSelectElement;
+
+  const distanzaMax = Number(distanza.max);
+  const dislivelloMax = Number(dislivello.max);
+  const tempoMax = Number(tempo.max);
+
+  const RAGGIO_VICINO_KM = 30; // placeholder threshold — see Open questions
+  let userCoords: { lat: number; lon: number } | null = null;
+
+  function haversineKm(lat1: number, lon1: number, lat2: number, lon2: number) {
+    const R = 6371;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((lat1 * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180) * Math.sin(dLon / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(a));
+  }
+
+  function applyFilters() {
+    const activeDifficolta = new Set(difficoltaBoxes.filter((b) => b.checked).map((b) => b.value));
+    let visible = 0;
+
+    for (const row of rows) {
+      const d = Number(row.dataset.distanza);
+      const el = Number(row.dataset.dislivello);
+      const t = Number(row.dataset.tempo);
+      const matchesRanges = d <= Number(distanza.value) && el <= Number(dislivello.value) && t <= Number(tempo.value);
+      const matchesDifficolta = activeDifficolta.has(row.dataset.difficolta!);
+      const matchesBambini = !bambini.checked || row.dataset.bambini === "true";
+      const matchesInverno = !inverno.checked || row.dataset.inverno === "true";
+      const matchesAnello = !anello.checked || row.dataset.anello === "true";
+      const matchesVicino =
+        !vicino.checked ||
+        !userCoords ||
+        haversineKm(userCoords.lat, userCoords.lon, Number(row.dataset.lat), Number(row.dataset.lon)) <= RAGGIO_VICINO_KM;
+
+      const match = matchesRanges && matchesDifficolta && matchesBambini && matchesInverno && matchesAnello && matchesVicino;
+      row.hidden = !match;
+      if (match) visible += 1;
+    }
+
+    countEl.textContent = `${visible} ${visible === 1 ? "ITINERARIO" : "ITINERARI"}`;
+  }
+
+  function applySort() {
+    const key = sort.value as "distanza" | "dislivello" | "tempo";
+    const sorted = [...rows].sort((a, b) => Number(a.dataset[key]) - Number(b.dataset[key]));
+    for (const row of sorted) list.appendChild(row);
+  }
+
+  function updateLabels() {
+    distanzaLabel.textContent = `0 – ${distanza.value} km`;
+    dislivelloLabel.textContent = `0 – ${dislivello.value} m`;
+    tempoLabel.textContent = `fino a ${tempo.value} h`;
+  }
+
+  for (const input of [distanza, dislivello, tempo, bambini, inverno, anello, ...difficoltaBoxes]) {
+    input.addEventListener("input", () => {
+      updateLabels();
+      applyFilters();
+    });
+  }
+
+  vicino.addEventListener("change", () => {
+    if (!vicino.checked) {
+      applyFilters();
+      return;
+    }
+    if (!navigator.geolocation) {
+      vicino.checked = false;
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        userCoords = { lat: pos.coords.latitude, lon: pos.coords.longitude };
+        applyFilters();
+      },
+      () => {
+        vicino.checked = false;
+      },
+    );
+  });
+
+  sort.addEventListener("change", applySort);
+
+  azzera.addEventListener("click", () => {
+    distanza.value = String(distanzaMax);
+    dislivello.value = String(dislivelloMax);
+    tempo.value = String(tempoMax);
+    bambini.checked = false;
+    inverno.checked = false;
+    anello.checked = false;
+    vicino.checked = false;
+    userCoords = null;
+    for (const box of difficoltaBoxes) box.checked = true;
+    updateLabels();
+    applyFilters();
+  });
+</script>

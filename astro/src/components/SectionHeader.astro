@@ -4,9 +4,10 @@ interface Props {
   tone?: "onCrema" | "onSage";
   action?: { label: string; href: string };
   meta?: string;
+  badge?: string;
 }
 
-const { label, tone = "onCrema", action, meta } = Astro.props;
+const { label, tone = "onCrema", action, meta, badge } = Astro.props;
 const labelColor = tone === "onSage" ? "text-terra" : "text-verde";
 ---
 
@@ -18,5 +19,8 @@ const labelColor = tone === "onSage" ? "text-terra" : "text-verde";
   )}
   {meta && (
     <span class="font-mono-data text-xs text-inchiostro/82">{meta}</span>
+  )}
+  {badge && (
+    <span class="font-mono-data text-[11.5px] tracking-wider font-medium text-terra">{badge}</span>
   )}
 </div>

@@ -1,0 +1,29 @@
+---
+interface GalleryImage {
+  url: string;
+  caption: string | null;
+}
+
+interface Props {
+  cover: GalleryImage;
+  images: GalleryImage[];
+}
+
+const { cover, images } = Astro.props;
+---
+
+<div>
+  <img src={cover.url} alt={cover.caption ?? ""} class="h-[260px] w-full rounded-lg object-cover" />
+  {cover.caption && <p class="mt-3 text-sm text-inchiostro/82">{cover.caption}</p>}
+
+  {images.length > 0 && (
+    <div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {images.map((img) => (
+        <div>
+          <img src={img.url} alt={img.caption ?? ""} class="aspect-[3/2] w-full rounded-lg object-cover" />
+          <p class="mt-2.5 text-[12.5px] text-inchiostro/82">{img.caption ?? "Didascalia immagine"}</p>
+        </div>
+      ))}
+    </div>
+  )}
+</div>

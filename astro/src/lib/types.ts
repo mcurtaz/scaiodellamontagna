@@ -20,6 +20,12 @@ export interface Articolo {
   autore: number | Autore;
 }
 
+export interface GalleriaImage {
+  directus_files_id: string;
+  didascalia: string | null;
+  sort: number | null;
+}
+
 export interface Itinerario {
   id: number;
   titolo: string;
@@ -37,10 +43,19 @@ export interface Itinerario {
   traccia_gpx: string | null;
   descrizione: string;
   autore: number | Autore;
+  galleria?: GalleriaImage[];
+}
+
+export interface ItinerarioCorrelatoJunction {
+  id: number;
+  tipo: "prosecuzione" | "variante" | "nella_zona";
+  itinerari_id: number | Itinerario;
+  itinerario_correlato: number | Itinerario;
 }
 
 export interface Schema {
   articoli: Articolo[];
   itinerari: Itinerario[];
+  itinerari_correlati: ItinerarioCorrelatoJunction[];
   autori: Autore[];
 }

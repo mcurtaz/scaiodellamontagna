@@ -1,0 +1,65 @@
+---
+interface Props {
+  maxDistanzaKm: number;
+  maxDislivelloM: number;
+  maxTempoOre: number;
+}
+
+const { maxDistanzaKm, maxDislivelloM, maxTempoOre } = Astro.props;
+const difficolta = ["T", "E", "EE", "EEA", "OFA"] as const;
+---
+
+<div>
+  <div class="flex items-center gap-4 mb-6">
+    <span class="font-mono-data text-xs tracking-widest uppercase text-terra">FILTRI</span>
+    <span class="flex-1 h-px bg-inchiostro/22"></span>
+    <button type="button" id="filtri-azzera" class="text-terra">Azzera</button>
+  </div>
+
+  <div class="grid grid-cols-1 gap-8 sm:grid-cols-3 sm:gap-9">
+    <label class="block">
+      <div class="flex justify-between font-mono-data text-[13px] mb-3.5">
+        <span class="text-inchiostro/82">distanza</span>
+        <span id="distanza-value">0 – {maxDistanzaKm} km</span>
+      </div>
+      <input type="range" id="filtro-distanza" min="0" max={maxDistanzaKm} value={maxDistanzaKm} step="0.5" class="w-full accent-verde" />
+    </label>
+    <label class="block">
+      <div class="flex justify-between font-mono-data text-[13px] mb-3.5">
+        <span class="text-inchiostro/82">dislivello +</span>
+        <span id="dislivello-value">0 – {maxDislivelloM} m</span>
+      </div>
+      <input type="range" id="filtro-dislivello" min="0" max={maxDislivelloM} value={maxDislivelloM} step="10" class="w-full accent-verde" />
+    </label>
+    <label class="block">
+      <div class="flex justify-between font-mono-data text-[13px] mb-3.5">
+        <span class="text-inchiostro/82">tempo medio</span>
+        <span id="tempo-value">fino a {maxTempoOre} h</span>
+      </div>
+      <input type="range" id="filtro-tempo" min="0" max={maxTempoOre} value={maxTempoOre} step="0.5" class="w-full accent-verde" />
+    </label>
+  </div>
+
+  <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:items-start">
+    <div>
+      <div class="font-mono-data text-[13px] text-inchiostro/82 mb-4">difficoltà</div>
+      <div class="flex gap-5 font-mono-data text-sm">
+        {difficolta.map((level) => (
+          <label class="cursor-pointer">
+            <input type="checkbox" name="difficolta" value={level} checked class="peer sr-only" />
+            <span class="text-inchiostro/82 border-b-2 border-transparent pb-1 peer-checked:text-inchiostro peer-checked:font-medium peer-checked:border-terra">{level}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+    <div class="sm:col-span-2">
+      <div class="font-mono-data text-[13px] text-inchiostro/82 mb-4">caratteristiche</div>
+      <div class="flex flex-wrap gap-6 text-sm">
+        <label class="flex items-center gap-2"><input type="checkbox" id="filtro-bambini" class="accent-verde" /> Adatto ai bambini</label>
+        <label class="flex items-center gap-2"><input type="checkbox" id="filtro-inverno" class="accent-verde" /> Adatto in inverno</label>
+        <label class="flex items-center gap-2"><input type="checkbox" id="filtro-anello" class="accent-verde" /> Ad anello</label>
+        <label class="flex items-center gap-2"><input type="checkbox" id="filtro-vicino" class="accent-verde" /> Vicino a me</label>
+      </div>
+    </div>
+  </div>
+</div>

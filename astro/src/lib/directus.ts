@@ -1,5 +1,5 @@
 import { createDirectus, rest, staticToken, readItems, aggregate } from "@directus/sdk";
-import type { Schema } from "./types";
+import type { Itinerario, Schema } from "./types";
 
 const client = createDirectus<Schema>(import.meta.env.DIRECTUS_URL)
   .with(staticToken(import.meta.env.DIRECTUS_TOKEN))
@@ -42,6 +42,51 @@ export function getHomeItinerari() {
       limit: 2,
     }),
   );
+}
+
+export function getItinerari() {
+  return client.request(
+    readItems("itinerari", {
+      fields: [
+        "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo",
+        "dislivello_negativo", "tempo_medio_ore", "is_loop", "is_child_friendly",
+        "is_winter_friendly", "punto_partenza", "punto_arrivo", "descrizione",
+      ],
+      sort: ["-date_created"],
+    }),
+  );
+}
+
+export function getItinerariDetail() {
+  return client.request(
+    readItems("itinerari", {
+      fields: [
+        "id", "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo",
+        "dislivello_negativo", "tempo_medio_ore", "is_loop", "is_child_friendly",
+        "is_winter_friendly", "punto_partenza", "punto_arrivo", "traccia_gpx", "descrizione",
+        { autore: ["nome"] },
+        { galleria: ["directus_files_id", "didascalia", "sort"] },
+      ],
+    }),
+  );
+}
+
+export async function getCorrelati(id: number) {
+  const junctions = await client.request(
+    readItems("itinerari_correlati", {
+      filter: { _or: [{ itinerari_id: { _eq: id } }, { itinerario_correlato: { _eq: id } }] },
+      fields: [
+        "tipo",
+        { itinerari_id: ["id", "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo", "dislivello_negativo", "tempo_medio_ore", "is_loop", "punto_partenza", "punto_arrivo"] },
+        { itinerario_correlato: ["id", "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo", "dislivello_negativo", "tempo_medio_ore", "is_loop", "punto_partenza", "punto_arrivo"] },
+      ],
+    }),
+  );
+
+  return junctions.map((j) => ({
+    tipo: j.tipo,
+    itinerario: (typeof j.itinerari_id === "object" && j.itinerari_id.id === id ? j.itinerario_correlato : j.itinerari_id) as Itinerario,
+  }));
 }
 
 export async function getCounts() {

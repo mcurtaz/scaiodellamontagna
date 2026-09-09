@@ -7,23 +7,35 @@ interface Props {
   difficulty: "T" | "E" | "EE" | "EEA" | "OFA";
   distanceKm: number;
   elevationGainM: number;
+  elevationLossM?: number;
   timeLabel: string;
   typeLabel: string;
+  excerpt?: string;
 }
 
-const { title, href, difficulty, distanceKm, elevationGainM, timeLabel, typeLabel } = Astro.props;
+const {
+  title, href, difficulty, distanceKm, elevationGainM, elevationLossM,
+  timeLabel, typeLabel, excerpt,
+} = Astro.props;
 ---
 
-<div class="grid grid-cols-[64px_1fr] sm:grid-cols-[96px_1fr_210px] gap-4 sm:gap-6 items-center py-5">
+<div class={`grid grid-cols-[64px_1fr] sm:grid-cols-[96px_1fr_210px] gap-4 sm:gap-6 py-5 ${excerpt ? "items-start" : "items-center"}`}>
   <a href={href} class="media-placeholder media-placeholder-grid h-16 sm:h-[72px] row-span-2 sm:row-span-1"></a>
-  <div class="flex items-baseline gap-3.5">
-    <h3 class="text-xl sm:text-2xl font-normal tracking-tight leading-snug">
-      <a href={href} class="hover:text-terra">{title}</a>
-    </h3>
-    <DifficultyBadge level={difficulty} />
+  <div>
+    <div class="flex items-baseline gap-3.5">
+      <h3 class="text-xl sm:text-2xl font-normal tracking-tight leading-snug">
+        <a href={href} class="hover:text-terra">{title}</a>
+      </h3>
+      <DifficultyBadge level={difficulty} />
+    </div>
+    {excerpt && <p class="mt-2 text-sm text-inchiostro/82">{excerpt}</p>}
   </div>
   <div class="col-start-2 sm:col-start-3 font-mono-data text-xs text-inchiostro/80 leading-loose sm:text-right">
-    {distanceKm} km · {elevationGainM} m D+<br />
+    {elevationLossM !== undefined ? (
+      <>{distanceKm} km<br />{elevationGainM} m D+ · {elevationLossM} m D−<br /></>
+    ) : (
+      <>{distanceKm} km · {elevationGainM} m D+<br /></>
+    )}
     {timeLabel} · {typeLabel}
   </div>
 </div>

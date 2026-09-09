@@ -1,0 +1,139 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SageBand from "../../components/SageBand.astro";
+import SectionHeader from "../../components/SectionHeader.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import DataTable from "../../components/DataTable.astro";
+import MapThumbnail from "../../components/MapThumbnail.astro";
+import Gallery from "../../components/Gallery.astro";
+import RouteListItem from "../../components/RouteListItem.astro";
+import { getItinerariDetail, getCorrelati, assetUrl } from "../../lib/directus";
+import {
+  formatHoursDecimal, formatCoordinates, sameCoordinates, caratteristicheLines,
+  formatTimeLabel, getTypeLabel,
+} from "../../lib/format";
+import { DIFFICOLTA_LABELS } from "../../lib/difficolta";
+import type { Itinerario, Autore } from "../../lib/types";
+
+const TIPO_LABELS = { prosecuzione: "PROSECUZIONE", variante: "VARIANTE", nella_zona: "NELLA ZONA" } as const;
+const TIPO_ORDER = ["prosecuzione", "variante", "nella_zona"] as const;
+
+export async function getStaticPaths() {
+  const itinerari = await getItinerariDetail();
+  const correlati = await Promise.all(itinerari.map((it) => getCorrelati(it.id)));
+  return itinerari.map((itinerario, i) => ({
+    params: { slug: itinerario.slug },
+    props: { itinerario, correlati: correlati[i] },
+  }));
+}
+
+interface Props {
+  itinerario: Itinerario & { autore: Autore };
+  correlati: { tipo: "prosecuzione" | "variante" | "nella_zona"; itinerario: Itinerario }[];
+}
+
+const { itinerario: it, correlati } = Astro.props;
+
+const rows = [
+  { label: "distanza", value: `${Number(it.distanza_km).toLocaleString("it-IT")} km` },
+  { label: "dislivello +", value: `${it.dislivello_positivo} m` },
+  { label: "dislivello −", value: `${it.dislivello_negativo} m` },
+  { label: "tempo medio", value: formatHoursDecimal(it.tempo_medio_ore) },
+  { label: "partenza", value: formatCoordinates(it.punto_partenza) },
+  {
+    label: "arrivo",
+    value: sameCoordinates(it.punto_partenza, it.punto_arrivo) ? "stesso punto" : formatCoordinates(it.punto_arrivo),
+  },
+];
+
+const paragraphs = it.descrizione.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+const caratteristiche = caratteristicheLines(it);
+
+const sortedGalleria = [...(it.galleria ?? [])].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
+const [coverImg, ...restImg] = sortedGalleria;
+const cover = coverImg && {
+  url: assetUrl(coverImg.directus_files_id, { width: 1200, quality: 80 }),
+  caption: coverImg.didascalia,
+};
+const galleryRest = restImg.map((img) => ({
+  url: assetUrl(img.directus_files_id, { width: 500, quality: 80 }),
+  caption: img.didascalia,
+}));
+
+const correlatiGroups = TIPO_ORDER
+  .map((tipo) => ({ tipo, items: correlati.filter((c) => c.tipo === tipo) }))
+  .filter((g) => g.items.length > 0);
+---
+
+<Layout title={it.titolo} active="itinerari">
+  <div class="px-4 pt-8 sm:px-8 md:px-14">
+    <SectionHeader label="ITINERARIO" meta={it.autore.nome} />
+    <div class="mt-8">
+      <PageHeader title={it.titolo}>
+        <p class="text-inchiostro/82">
+          Difficoltà <span class="font-semibold text-verde">{it.difficolta} — {DIFFICOLTA_LABELS[it.difficolta].toLowerCase()}</span>,
+          {" "}{getTypeLabel(it)}.
+        </p>
+      </PageHeader>
+    </div>
+  </div>
+
+  <SageBand>
+    <SectionHeader label="DATI" tone="onSage" />
+    <div class="mt-6">
+      <DataTable rows={rows} />
+    </div>
+  </SageBand>
+
+  <section class="px-4 py-8 sm:px-8 md:px-14">
+    <SectionHeader
+      label="TRACCIA"
+      action={it.traccia_gpx ? { label: "Scarica GPX ↓", href: assetUrl(it.traccia_gpx) } : undefined}
+    />
+    <div class="mt-6">
+      <MapThumbnail />
+    </div>
+  </section>
+
+  <section class="px-4 pb-8 sm:px-8 md:px-14">
+    <SectionHeader label="DESCRIZIONE" />
+    <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-[1.5fr_1fr] md:gap-12">
+      <div class="space-y-5">
+        {paragraphs.map((p) => (
+          <p class="text-[17.5px] leading-[1.72] text-inchiostro">{p}</p>
+        ))}
+      </div>
+      <div class="border-l-2 border-terra pl-5 text-sm leading-loose text-inchiostro/82">
+        {caratteristiche.map((line) => <>{line}<br /></>)}
+      </div>
+    </div>
+  </section>
+
+  {cover && (
+    <section class="px-4 pb-8 sm:px-8 md:px-14">
+      <SectionHeader label="GALLERIA" meta={`${sortedGalleria.length} ${sortedGalleria.length === 1 ? "immagine" : "immagini"}`} />
+      <div class="mt-6">
+        <Gallery cover={cover} images={galleryRest} />
+      </div>
+    </section>
+  )}
+
+  {correlatiGroups.map((group) => (
+    <SageBand>
+      <SectionHeader label="SI COLLEGA CON" tone="onSage" badge={TIPO_LABELS[group.tipo]} />
+      <div class="mt-8 divide-y divide-inchiostro/14">
+        {group.items.map((c) => (
+          <RouteListItem
+            title={c.itinerario.titolo}
+            href={`/itinerari/${c.itinerario.slug}`}
+            difficulty={c.itinerario.difficolta}
+            distanceKm={Number(c.itinerario.distanza_km)}
+            elevationGainM={c.itinerario.dislivello_positivo}
+            timeLabel={formatTimeLabel(c.itinerario.tempo_medio_ore)}
+            typeLabel={getTypeLabel(c.itinerario)}
+          />
+        ))}
+      </div>
+    </SageBand>
+  ))}
+</Layout>
