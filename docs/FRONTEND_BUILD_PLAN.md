@@ -1,6 +1,7 @@
 # Frontend build plan — from mockup to Astro site
 
-Status: v1 draft — 2026-09-08.
+Status: v1 draft — 2026-09-08, updated 2026-09-09 (Steps 7–9 specced,
+junction permissions fixed).
 
 This document is the reference for how we go from the Claude Design mockup
 (`Scaio della Montagna.dc.html`, project root) to the real Astro frontend. It
@@ -30,11 +31,16 @@ component props are grounded in real field names, not guesses:
   `autore` (m2o → autori). Two m2m relations, re-verified against the live
   instance (field names corrected from an earlier draft of this doc):
   `galleria` (→ `directus_files`, junction collection `itinerari_galleria`
-  with `directus_files_id`, `sort`, `didascalia` caption) and `correlati`
-  (self-referencing, junction collection `itinerari_correlati` with
-  `itinerario_correlato`, `tipo`). **Both junction collections currently have
-  zero permission rows for the API Reader policy** — needs a permissions fix
-  before Step 9 can fetch either.
+  with `itinerari_id`, `directus_files_id`, `sort`, `didascalia` caption) and
+  `correlati` (self-referencing, junction collection `itinerari_correlati`
+  with `itinerari_id`, `itinerario_correlato`, `tipo`). **API Reader now has
+  Read access on both junction collections** (fixed 2026-09-09 — previously
+  zero permission rows blocked both). One nuance confirmed while verifying
+  the fix: querying the auto-generated `correlati` m2m field only returns
+  one direction of the symmetric relation (the side the junction row was
+  created from); Step 9's query needs to hit `itinerari_correlati` directly
+  with an `_or` filter across `itinerari_id`/`itinerario_correlato` to get
+  both directions — see `docs/FRONTEND_STEP_9_ITINERARIO_DETAIL.md`.
 - **articoli**: `titolo`, `slug`, `immagine` (file id), `testo` (markdown),
   `autore` (m2o → autori).
 - **autori**: `nome`, `bio`, `foto` (file id).
@@ -113,8 +119,11 @@ Fonts: **Epilogue** (body/display, weights 400/500/600) and **IBM Plex Mono**
 
 ## Build order
 
-Detailed, executable specs exist for steps 1–5 (see below); later steps stay
-at the strategy level until we get there.
+Detailed, executable specs exist for all nine steps (see below) — Step 9
+still carries an open question this doc can't resolve on its own (static map
+generation, research pending per `PROJECT_SPEC.md`); the junction-permissions
+blocker that also affected Step 9 has been fixed (see the schema section
+above).
 
 1. **Design tokens + fonts** → `docs/FRONTEND_STEP_1_TOKENS.md`
 2. **Chrome: Layout, Nav, Footer** → `docs/FRONTEND_STEP_2_CHROME.md`
@@ -127,12 +136,15 @@ at the strategy level until we get there.
 6. **Articoli listing + Articolo detail**, wired to Directus immediately
    (pattern already proven in step 5) →
    `docs/FRONTEND_STEP_6_ARTICOLI.md`
-7. **Itinerari listing**, static/non-interactive filters first.
-8. **Itinerari filters**, made interactive with vanilla JS.
-9. **Itinerario detail** — last and most complex: data table, gallery (needs
-   `galleria_immagini` shape inspected), related routes (needs the
-   `itinerari_correlati` junction permission/shape sorted out), and the
-   static-vs-interactive map decision made right before this step.
+7. **Itinerari listing**, static/non-interactive filters first →
+   `docs/FRONTEND_STEP_7_ITINERARI_LISTING.md`
+8. **Itinerari filters**, made interactive with vanilla JS →
+   `docs/FRONTEND_STEP_8_ITINERARI_FILTERS.md`
+9. **Itinerario detail** — last and most complex: data table, gallery, and
+   related routes (junction permissions fixed, shapes confirmed — see the
+   schema section above), plus the still-open static map generation
+   mechanism (research pending per `PROJECT_SPEC.md`) →
+   `docs/FRONTEND_STEP_9_ITINERARIO_DETAIL.md`
 
 ## Verification per step
 
