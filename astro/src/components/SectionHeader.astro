@@ -3,9 +3,10 @@ interface Props {
   label: string;
   tone?: "onCrema" | "onSage";
   action?: { label: string; href: string };
+  meta?: string;
 }
 
-const { label, tone = "onCrema", action } = Astro.props;
+const { label, tone = "onCrema", action, meta } = Astro.props;
 const labelColor = tone === "onSage" ? "text-terra" : "text-verde";
 ---
 
@@ -14,5 +15,8 @@ const labelColor = tone === "onSage" ? "text-terra" : "text-verde";
   <span class="flex-1 h-px bg-current/20 min-w-6"></span>
   {action && (
     <a href={action.href} class="text-terra">{action.label}</a>
+  )}
+  {meta && (
+    <span class="font-mono-data text-xs text-inchiostro/82">{meta}</span>
   )}
 </div>

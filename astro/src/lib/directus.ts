@@ -12,6 +12,15 @@ export function assetUrl(fileId: string, params?: { width?: number; quality?: nu
   return url.toString();
 }
 
+export function getArticoli() {
+  return client.request(
+    readItems("articoli", {
+      fields: ["titolo", "slug", "immagine", "testo", "date_created", { autore: ["nome"] }],
+      sort: ["-date_created"],
+    }),
+  );
+}
+
 export function getHomeArticoli() {
   return client.request(
     readItems("articoli", {

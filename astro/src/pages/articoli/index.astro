@@ -1,0 +1,39 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SageBand from "../../components/SageBand.astro";
+import SectionHeader from "../../components/SectionHeader.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import ArticleListItem from "../../components/ArticleListItem.astro";
+import { getArticoli, assetUrl } from "../../lib/directus";
+import { formatDate } from "../../lib/format";
+
+const articoli = await getArticoli();
+---
+
+<Layout title="Articoli" active="articoli">
+  <SageBand>
+    <SectionHeader label="ARTICOLI" tone="onSage" meta={`${articoli.length} pubblicati`} />
+    <div class="mt-8">
+      <PageHeader title="Appunti di montagna">
+        <p class="text-inchiostro/82">
+          Attrezzatura, lettura della difficoltà, cose imparate sbagliando.
+          In ordine di pubblicazione.
+        </p>
+      </PageHeader>
+    </div>
+  </SageBand>
+
+  <section class="px-4 py-8 sm:px-8 md:px-14">
+    <div class="divide-y divide-inchiostro/14">
+      {articoli.map((a) => (
+        <ArticleListItem
+          title={a.titolo}
+          href={`/articoli/${a.slug}`}
+          author={a.autore.nome}
+          date={formatDate(a.date_created)}
+          imageUrl={a.immagine ? assetUrl(a.immagine, { width: 192, quality: 80 }) : undefined}
+        />
+      ))}
+    </div>
+  </section>
+</Layout>

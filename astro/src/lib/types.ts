@@ -16,6 +16,7 @@ export interface Articolo {
   slug: string;
   immagine: string | null;
   testo: string;
+  date_created: string;
   autore: number | Autore;
 }
 

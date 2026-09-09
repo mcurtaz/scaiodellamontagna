@@ -1,0 +1,81 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import SageBand from "../../components/SageBand.astro";
+import SectionHeader from "../../components/SectionHeader.astro";
+import PageHeader from "../../components/PageHeader.astro";
+import ArticleListItem from "../../components/ArticleListItem.astro";
+import { getArticoli, assetUrl } from "../../lib/directus";
+import { formatDate } from "../../lib/format";
+import type { Articolo, Autore } from "../../lib/types";
+
+export async function getStaticPaths() {
+  const articoli = await getArticoli();
+  return articoli.map((articolo) => ({
+    params: { slug: articolo.slug },
+    props: {
+      articolo,
+      others: articoli.filter((a) => a.slug !== articolo.slug).slice(0, 3),
+    },
+  }));
+}
+
+interface Props {
+  articolo: Articolo & { autore: Autore };
+  others: (Articolo & { autore: Autore })[];
+}
+
+const { articolo, others } = Astro.props;
+const paragraphs = articolo.testo.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+---
+
+<Layout title={articolo.titolo} active="articoli">
+  <div class="px-4 pt-8 sm:px-8 md:px-14">
+    <SectionHeader label="ARTICOLO" meta={`${articolo.autore.nome} · ${formatDate(articolo.date_created)}`} />
+    <div class="mt-8">
+      <PageHeader title={articolo.titolo} />
+    </div>
+  </div>
+
+  <div class="px-4 py-8 sm:px-8 md:px-14">
+    {articolo.immagine ? (
+      <img
+        src={assetUrl(articolo.immagine, { width: 1200, quality: 80 })}
+        alt=""
+        class="h-[320px] w-full rounded-lg object-cover"
+      />
+    ) : (
+      <div class="media-placeholder media-placeholder-diagonal h-[320px] w-full"></div>
+    )}
+  </div>
+
+  <div class="px-4 pb-8 sm:px-8 md:px-14">
+    <SectionHeader label="TESTO" />
+    <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-[1.5fr_1fr] md:gap-12">
+      <div class="space-y-5">
+        {paragraphs.map((p) => (
+          <p class="text-[17.5px] leading-[1.72] text-inchiostro">{p}</p>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  {others.length > 0 && (
+    <SageBand>
+      <SectionHeader
+        label="ALTRI ARTICOLI"
+        tone="onSage"
+        action={{ label: "Tutti gli articoli →", href: "/articoli" }}
+      />
+      <div class="mt-8 divide-y divide-inchiostro/14">
+        {others.map((a) => (
+          <ArticleListItem
+            title={a.titolo}
+            href={`/articoli/${a.slug}`}
+            author={a.autore.nome}
+            imageUrl={a.immagine ? assetUrl(a.immagine, { width: 192, quality: 80 }) : undefined}
+          />
+        ))}
+      </div>
+    </SageBand>
+  )}
+</Layout>
