@@ -48,10 +48,18 @@ its own project root (`astro/`), so add:
 ```js
 // astro.config.mjs
 export default defineConfig({
-  envDir: "../", // read the repo-root .env instead of astro/.env
-  vite: { plugins: [tailwindcss()] },
+  vite: {
+    envDir: "../", // read the repo-root .env instead of astro/.env
+    plugins: [tailwindcss()],
+  },
 });
 ```
+
+`envDir` must live under the `vite` key, not top-level — Astro's env loader
+(`env-loader.js`) reads `config.vite.envDir`, so a top-level `envDir` is
+silently ignored by the config schema and the SDK client gets built with
+`undefined` as its URL (`new URL()` then throws `Invalid URL` at build time,
+the first sign something's wrong).
 
 One `.env`, one source of truth, instead of copying values into a second
 `astro/.env`. This does mean `DIRECTUS_ADMIN_EMAIL`/`DIRECTUS_ADMIN_PASSWORD`

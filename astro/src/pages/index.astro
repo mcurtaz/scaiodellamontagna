@@ -6,6 +6,14 @@ import PageHeader from "../components/PageHeader.astro";
 import ArticleListItem from "../components/ArticleListItem.astro";
 import RouteListItem from "../components/RouteListItem.astro";
 import { CONTACT_EMAIL } from "../lib/site";
+import { getHomeArticoli, getHomeItinerari, getCounts, assetUrl } from "../lib/directus";
+import { formatTimeLabel, getTypeLabel } from "../lib/format";
+
+const [articoli, itinerari, counts] = await Promise.all([
+  getHomeArticoli(),
+  getHomeItinerari(),
+  getCounts(),
+]);
 ---
 
 <Layout title="Scaio della Montagna">
@@ -18,7 +26,7 @@ import { CONTACT_EMAIL } from "../lib/site";
           sezione Articoli. Cos'è la sezione Itinerari.
         </p>
         <p class="font-mono-data text-sm text-inchiostro/82 mt-5">
-          itinerari · 2 &nbsp; articoli · 2<br />
+          itinerari · {counts.itinerari} &nbsp; articoli · {counts.articoli}<br />
           zona · orobie &nbsp; contatti · <a href={`mailto:${CONTACT_EMAIL}`} class="hover:text-terra">email</a>
         </p>
       </PageHeader>
@@ -28,40 +36,31 @@ import { CONTACT_EMAIL } from "../lib/site";
   <section class="px-4 py-8 sm:px-8 md:px-14">
     <SectionHeader label="ULTIMI ARTICOLI" action={{ label: "Tutti gli articoli →", href: "/articoli" }} />
     <div class="divide-y divide-inchiostro/14">
-      <ArticleListItem
-        title="Cosa mettere nello zaino per un'escursione di giornata"
-        href="/articoli/cosa-mettere-nello-zaino"
-        author="michele curtaz"
-      />
-      <ArticleListItem
-        title="Come leggere la scala di difficoltà CAI"
-        href="/articoli/scala-difficolta-cai"
-        author="sara bonetti"
-      />
+      {articoli.map((a) => (
+        <ArticleListItem
+          title={a.titolo}
+          href={`/articoli/${a.slug}`}
+          author={a.autore.nome}
+          imageUrl={a.immagine ? assetUrl(a.immagine, { width: 192, quality: 80 }) : undefined}
+        />
+      ))}
     </div>
   </section>
 
   <section class="px-4 pb-8 sm:px-8 md:px-14">
     <SectionHeader label="ULTIMI ITINERARI" action={{ label: "Tutti gli itinerari →", href: "/itinerari" }} />
     <div class="divide-y divide-inchiostro/14">
-      <RouteListItem
-        title="Gita al Rifugio Curò"
-        href="/itinerari/gita-al-rifugio-curo"
-        difficulty="E"
-        distanceKm={9.2}
-        elevationGainM={850}
-        timeLabel="3 h 30"
-        typeLabel="andata e ritorno"
-      />
-      <RouteListItem
-        title="Da Rifugio Curò a Lago Gelt"
-        href="/itinerari/rifugio-curo-lago-gelt"
-        difficulty="E"
-        distanceKm={2.4}
-        elevationGainM={180}
-        timeLabel="1 h"
-        typeLabel="traversata"
-      />
+      {itinerari.map((r) => (
+        <RouteListItem
+          title={r.titolo}
+          href={`/itinerari/${r.slug}`}
+          difficulty={r.difficolta}
+          distanceKm={Number(r.distanza_km)}
+          elevationGainM={r.dislivello_positivo}
+          timeLabel={formatTimeLabel(r.tempo_medio_ore)}
+          typeLabel={getTypeLabel(r)}
+        />
+      ))}
     </div>
   </section>
 </Layout>
