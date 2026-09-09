@@ -125,7 +125,8 @@ at the strategy level until we get there.
    proves the data-fetching architecture on the lowest-risk page →
    `docs/FRONTEND_STEP_5_DIRECTUS_WIRING.md`
 6. **Articoli listing + Articolo detail**, wired to Directus immediately
-   (pattern already proven in step 5).
+   (pattern already proven in step 5) →
+   `docs/FRONTEND_STEP_6_ARTICOLI.md`
 7. **Itinerari listing**, static/non-interactive filters first.
 8. **Itinerari filters**, made interactive with vanilla JS.
 9. **Itinerario detail** — last and most complex: data table, gallery (needs
