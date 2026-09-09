@@ -64,44 +64,43 @@ Instead:
 
 ### Map rendering
 
-**Decided: static image**, not interactive. A map image (track + start/end
-markers) gets rendered once and shipped as a plain `<img>` — keeps the route
-page fully static, no client-side map JS/tile-server runtime dependency,
-consistent with the "static as possible" goal. (Ruled out: client-side
-Leaflet + OpenStreetMap tiles loading the GPX live — more flexible pan/zoom,
-but not worth the added JS/runtime dependency for a personal blog rather than
-a route-planning tool.)
+**Reopened — two candidate plans, decision pending.** The original v1 decision
+(static image only, no client-side map JS) is being reconsidered now that an
+interactive map + linked elevation-profile hover is on the table. Two full
+implementation plans have been written up; **pick one before implementing**:
 
-**Open — how/when the image gets generated (research pending: map/static-tile
-API costs and rate limits)**:
-- Leading candidate: don't render inside the Astro build at all (that would
-  mean regenerating every route's map on every `npm run build`, even for
-  routes whose GPX never changed — wasteful, and costly/rate-limited if the
-  renderer is a paid API). Instead, generate **once, on the Directus side**,
-  triggered by a Directus Flow when `traccia_gpx` is uploaded/changed, and
-  store the result as a new file field on `itinerari` (e.g.
-  `mappa_statica`). The Astro build then just fetches that field like any
-  other image asset — no rendering logic in the frontend build at all.
-- Still to research before committing: which rendering approach/provider —
-  a paid static-map API (e.g. Mapbox Static Images, Geoapify, Stadia Maps,
-  Thunderforest) vs. self-hosted rendering (e.g. a script using an
-  open-tile-based static-map library) — and what that costs/how it rate-limits
-  at this project's volume (tens of routes/year, so low absolute request
-  count, but worth checking per-request pricing and any free-tier caps).
+- [`MAP_PROFILE_PLAN_A_STATIC.md`](./MAP_PROFILE_PLAN_A_STATIC.md) — keeps the
+  original static-image decision. A Python container, triggered by a Directus
+  Flow on GPX upload, renders a static map PNG (free OSM tiles, self-hosted
+  rendering) and a static elevation-profile PNG, stored as new Directus file
+  fields (`mappa_statica`, `profilo_altimetrico`). No client-side map/chart JS
+  at all; the itinerari list thumbnail reuses `mappa_statica`.
+- [`MAP_PROFILE_PLAN_B_INTERACTIVE.md`](./MAP_PROFILE_PLAN_B_INTERACTIVE.md) —
+  reverses the static-image decision. No images generated at all: the list
+  thumbnail reuses a `galleria` image, and the detail page ships an
+  interactive MapTiler map plus a Chart.js elevation chart, both driven by a
+  small track-points JSON computed at Astro build time, with two-way hover
+  linking the map and the chart. No Directus schema/Flow changes, but adds
+  client-side map/chart JS and a live MapTiler account dependency (free tier
+  fits this project's volume, but is non-commercial-only and requires
+  attribution).
+
+Research already done (see both plan docs for detail): MapTiler's free tier
+does **not** include its Static Maps API (paid-plan only), and its Cloud ToS
+prohibits self-hosting a static-image renderer against its free tiles — which
+is why Plan A uses free OpenStreetMap tiles instead of MapTiler for the
+static-image path.
 
 ### Elevation profile ("profilo altimetrico") image
 
-**New idea, open — research pending.** In addition to the static map, also
-generate an elevation-profile chart image (distance on the x-axis, elevation
-on the y-axis) derived from the same GPX track's elevation points, and show
-it alongside the map on the Itinerario detail page's track section.
-
-Likely follows the same generation shape as the static map above — derived
-from `traccia_gpx`, generated once rather than at every build, stored as
-another file field on `itinerari` (e.g. `profilo_altimetrico`) — possibly via
-the same Directus Flow triggered on GPX upload, or a separate one. Not
-decided: the actual charting approach/library, and whether it shares a Flow
-with the map generation or runs independently.
+**Folded into the map-rendering decision above — see the same two plan
+docs.** Plan A generates a static elevation-profile PNG (matplotlib) in the
+same Directus Flow/Python container as the static map, stored as
+`profilo_altimetrico`. Plan B renders an interactive Chart.js elevation
+chart client-side instead, from the same build-time track-points JSON used
+for the interactive map, with the chart and map hover-linked. No separate
+decision needed here — whichever plan is chosen for the map applies to the
+elevation profile too.
 
 ## Search
 
@@ -189,11 +188,11 @@ same size, from anywhere, never touch the EC2 box again.
 - Autori page: unhide and design listing (later).
 - Auto-suggested related routes (later, if manual curation proves limiting).
 - Articolo ↔ Itinerario cross-linking (later, if useful).
-- Static map generation mechanism (Directus Flow + rendering provider):
-  researching map/static-tile API costs before committing — see "Map
-  rendering" above.
-- Elevation profile ("profilo altimetrico") image: new idea, researching
-  charting approach before committing — see "Elevation profile" above.
+- Map + elevation profile rendering: **decide between Plan A (static
+  images, Python container) and Plan B (interactive MapTiler map + Chart.js,
+  no generated images)** — see "Map rendering" above and the two linked plan
+  docs. Nothing else in this area should be implemented until this choice is
+  made.
 - Backup schedule/retention specifics.
 - Production infra details (EC2 sizing, CloudFront config, DNS, TLS) — S3
   storage + CloudFront-in-front-of-Directus is the researched direction (see
