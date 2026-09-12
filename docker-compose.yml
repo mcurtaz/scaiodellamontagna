@@ -42,5 +42,16 @@ services:
       - ./.directus-data/uploads:/directus/uploads
       - ./.directus-data/extensions:/directus/extensions
 
+  map-generator:
+    build: ./map-generator
+    container_name: scaio_map_generator
+    restart: unless-stopped
+    depends_on:
+      - directus
+    environment:
+      DIRECTUS_URL: http://directus:8055
+      DIRECTUS_TOKEN: ${DIRECTUS_TOKEN_MAP_GENERATOR}
+      DIRECTUS_UPLOAD_FOLDER_ID: ${DIRECTUS_MAP_GENERATOR_FOLDER_ID}
+
 volumes:
   postgres-data:

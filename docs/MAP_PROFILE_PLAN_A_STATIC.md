@@ -1,8 +1,8 @@
 # Map & Elevation Profile — Plan A: Static images via a Python generator container
 
-Status: **candidate plan, not decided** — see `MAP_PROFILE_PLAN_B_INTERACTIVE.md` for the
-alternative. `PROJECT_SPEC.md`'s "Map rendering" / "Elevation profile" sections link here;
-a decision between A and B must be made before implementation starts.
+Status: **decided — implemented**. See `MAP_PROFILE_PLAN_B_INTERACTIVE.md` for the rejected
+alternative, and `docs/DIRECTUS_SETUP.md` (section 6), `docs/DIRECTUS_USERS.md` (section 3), and
+`docs/DIRECTUS_MAP_FLOW.md` for the concrete setup steps.
 
 ## Summary
 
@@ -176,7 +176,17 @@ re-saving each such record once would trigger the Flow retroactively.)
 
 ## Open questions
 
-- FastAPI vs. something even smaller for the generator — leaning FastAPI, not decided.
-- Any visual/branding requirements for the map or chart styling (colors, markers), or is a
-  sensible default fine for v1?
-- Retry/error-handling story for a corrupt GPX or a transient Directus write failure.
+- ~~FastAPI vs. something even smaller for the generator~~ — decided: FastAPI (`map-generator/app.py`).
+- ~~Any visual/branding requirements for the map or chart styling~~ — decided: sensible
+  defaults (highlight-colored track line, green/red start/end markers, ~1200×630 map image,
+  smoothed elevation chart). See `map-generator/render.py`.
+- ~~Retry/error-handling story for a corrupt GPX or a transient Directus write failure~~ —
+  decided: no automatic retry in v1; failures return a non-2xx response, which surfaces in the
+  Directus Flow's run log (editors re-save the record to retry).
+- **Open**: deleting an `itinerari` record does **not** delete its associated files
+  (`traccia_gpx`, `mappa_statica`, `profilo_altimetrico`, `galleria`) — Directus file fields are
+  plain FK references, and nothing reacts to `items.delete`. Deleted routes leave orphaned files
+  in the File Library. A fix would need a **Filter** (blocking, pre-delete) Event Hook Flow that
+  reads the item's file fields before the row is removed and deletes them, since a post-delete
+  Action trigger no longer has access to the deleted record's field values. Not implemented —
+  cleanup is manual for now, same as the pre-existing `traccia_gpx`/`galleria` orphan risk.

@@ -4,7 +4,7 @@ import SageBand from "../../components/SageBand.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import RouteListItem from "../../components/RouteListItem.astro";
 import FilterPanel from "../../components/FilterPanel.astro";
-import { getItinerari } from "../../lib/directus";
+import { getItinerari, assetUrl } from "../../lib/directus";
 import { formatTimeLabel, getTypeLabel, formatExcerpt } from "../../lib/format";
 
 const itinerari = await getItinerari();
@@ -67,6 +67,7 @@ const countLabel = `${itinerari.length} ${itinerari.length === 1 ? "ITINERARIO" 
             timeLabel={formatTimeLabel(r.tempo_medio_ore)}
             typeLabel={getTypeLabel(r)}
             excerpt={formatExcerpt(r.descrizione)}
+            imageUrl={r.mappa_statica ? assetUrl(r.mappa_statica, { width: 200, quality: 70 }) : undefined}
           />
         </div>
       ))}

@@ -2,11 +2,12 @@
 
 Do this **after** [`DIRECTUS_SETUP.md`](./DIRECTUS_SETUP.md) (permissions are set per-collection, so the collections must exist first).
 
-Three roles, per `PROJECT_SPEC.md`:
+Four roles, per `PROJECT_SPEC.md` plus the map/elevation generator from `MAP_PROFILE_PLAN_A_STATIC.md`:
 
 1. **Administrator** — you. Already exists by default in Directus, full access. Nothing to configure.
 2. **Contributor** — other people who write articles/routes.
 3. **API Reader** — not a human role. A machine role used by the Astro build to pull published content via a static token, kept separate from the public "Public" role so access can be locked down precisely and rotated independently.
+4. **Map Generator** — not a human role. A machine role used by the `map-generator` service to read `traccia_gpx` and write back `mappa_statica`/`profilo_altimetrico`. Kept separate from `API Reader` so this service's write access can't be reached with the frontend's read-only token.
 
 ---
 
@@ -80,6 +81,50 @@ This matches what `.env.example` already expects: `DIRECTUS_TOKEN=your-static-to
 
 ---
 
+## 3. Role: Map Generator (for the `map-generator` service)
+
+This is the role behind `DIRECTUS_TOKEN_MAP_GENERATOR` in `.env` — the `map-generator` container
+calls the Directus REST API with this token to read GPX tracks and write back the generated
+map/elevation images. **Do not reuse `DIRECTUS_TOKEN`** (the frontend's read-only token) for this —
+this role needs write access, which the frontend's token must never have.
+
+Settings → **Access Control** → **Create Role**.
+
+- Name: `Map Generator`
+- App Access: **off** (API-only, never logs into the Studio)
+- Admin Access: **off**
+
+Permissions:
+
+| Collection | Create | Read | Update | Delete |
+|---|---|---|---|---|
+| `itinerari` | ❌ | ✅ All | ✅ All | ❌ |
+| `directus_files` | ✅ All | ✅ All | ✅ All | ✅ All |
+
+- `itinerari` read is needed to fetch `traccia_gpx`; update is needed to set
+  `mappa_statica`/`profilo_altimetrico` after generating them.
+- `directus_files` needs full CRUD: create for the new PNGs, read to fetch the GPX asset, delete to
+  remove the previous generation's files before replacing them.
+
+Everything else: no access.
+
+### Generate the static token
+
+1. Settings → Users → **Create User**.
+   - Name: e.g. `map-generator`
+   - Email: any placeholder, e.g. `map-generator@scaiodellamontagna.local`
+   - Role: `Map Generator`
+   - Status: **Active**
+2. Open that user → scroll to **Token** field → generate a static access token.
+3. Copy it into `.env` as `DIRECTUS_TOKEN_MAP_GENERATOR`.
+4. Optional: open the `Itinerari / Generati` folder (created in `DIRECTUS_SETUP.md` section 0),
+   copy its id from the URL, and set it in `.env` as `DIRECTUS_MAP_GENERATOR_FOLDER_ID` so generated
+   files are filed there instead of the File Library root.
+
+Next: [`DIRECTUS_MAP_FLOW.md`](./DIRECTUS_MAP_FLOW.md) to wire up the Flow that calls this service.
+
+---
+
 ## Recap
 
 | Role | Who | App Access | Scope |
@@ -87,5 +132,6 @@ This matches what `.env.example` already expects: `DIRECTUS_TOKEN=your-static-to
 | Administrator | you (`michele.curtaz@libemax.com`) | ✅ | everything |
 | Contributor | other writers | ✅ | full CRUD on `articoli`/`itinerari`(+junctions), read-only `autori` |
 | API Reader | `astro-build` service user, static token | ❌ | read-only, all content (archived filtering done at query time until a premium instance enables Custom policies) |
+| Map Generator | `map-generator` service user, static token | ❌ | read `itinerari`, update `itinerari`, full CRUD on `directus_files` |
 
 Next: [`MOCK_DATA.md`](./MOCK_DATA.md) to populate mock content for local Astro development.

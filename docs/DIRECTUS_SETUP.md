@@ -21,6 +21,8 @@ Go to the **File Library** module (sidebar, folder icon) → **Create Folder**:
 3. Create `Itinerari` — then open it and **Create Folder** again *inside* it (nested) to add:
    - `GPX`
    - `Galleria`
+   - `Generati` — holds the `mappa_statica` / `profilo_altimetrico` images produced by the
+     `map-generator` service (see section 6).
 
 End state:
 
@@ -30,7 +32,8 @@ File Library
 ├── Articoli
 └── Itinerari
     ├── GPX
-    └── Galleria
+    ├── Galleria
+    └── Generati
 ```
 
 These are plain organizational folders in the File Library, not new collections — `directus_files` stays a single table, folders just group rows by a `folder` reference. Each file field below gets pointed at one of these as its **default upload folder** (see the "Folder" note on each field) — this only changes where *new* uploads are filed and which folder the file picker opens into by default; it doesn't restrict a field to *only* files from that folder.
@@ -172,5 +175,26 @@ Known limitation, accepted for v1: because this is a self-referencing M2M, editi
 - `Articoli` — default for `articoli.immagine`
 - `Itinerari / GPX` — default for `itinerari.traccia_gpx`
 - `Itinerari / Galleria` — default for `itinerari.galleria`
+- `Itinerari / Generati` — default for `itinerari.mappa_statica` / `itinerari.profilo_altimetrico`
 
-Next: [`DIRECTUS_USERS.md`](./DIRECTUS_USERS.md) for roles and permissions, then [`MOCK_DATA.md`](./MOCK_DATA.md) to populate content for the Astro build.
+Next: [`DIRECTUS_USERS.md`](./DIRECTUS_USERS.md) for roles and permissions, then [`MOCK_DATA.md`](./MOCK_DATA.md) to populate content for the Astro build. For the static map/elevation generator specifically, see section 6 below and [`DIRECTUS_MAP_FLOW.md`](./DIRECTUS_MAP_FLOW.md).
+
+---
+
+## 6. Fields: `mappa_statica` / `profilo_altimetrico` (map & elevation generator)
+
+Per [`MAP_PROFILE_PLAN_A_STATIC.md`](./MAP_PROFILE_PLAN_A_STATIC.md): these two fields hold the
+static map PNG and elevation-profile PNG that the `map-generator` service produces automatically
+whenever `traccia_gpx` is uploaded/changed. Add them to the existing `itinerari` collection:
+
+| Key | Type | Interface | Required | Notes |
+|---|---|---|---|---|
+| `mappa_statica` | File (single image) | Image | — | Nullable — empty until the Flow (see `DIRECTUS_MAP_FLOW.md`) generates it. Editors can manually replace it to override a bad render. |
+| `profilo_altimetrico` | File (single image) | Image | — | Same as above, for the elevation-profile chart. |
+
+After creating each field: edit it → **Interface** tab → **Folder** setting → select
+`Itinerari / Generati`.
+
+Do **not** mark these fields required — a freshly created `itinerari` record has neither until the
+Flow runs (or never, if it has no `traccia_gpx`), and the frontend already handles that case with a
+placeholder (see `MapThumbnail.astro` / `ElevationProfile.astro`).

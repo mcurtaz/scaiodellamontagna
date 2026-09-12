@@ -11,16 +11,23 @@ interface Props {
   timeLabel: string;
   typeLabel: string;
   excerpt?: string;
+  imageUrl?: string;
 }
 
 const {
   title, href, difficulty, distanceKm, elevationGainM, elevationLossM,
-  timeLabel, typeLabel, excerpt,
+  timeLabel, typeLabel, excerpt, imageUrl,
 } = Astro.props;
 ---
 
 <div class={`grid grid-cols-[64px_1fr] sm:grid-cols-[96px_1fr_210px] gap-4 sm:gap-6 py-5 ${excerpt ? "items-start" : "items-center"}`}>
-  <a href={href} class="media-placeholder media-placeholder-grid h-16 sm:h-[72px] row-span-2 sm:row-span-1"></a>
+  {imageUrl ? (
+    <a href={href} class="block h-16 sm:h-[72px] row-span-2 sm:row-span-1 overflow-hidden rounded-lg">
+      <img src={imageUrl} alt="" class="h-full w-full object-cover" />
+    </a>
+  ) : (
+    <a href={href} class="media-placeholder media-placeholder-grid h-16 sm:h-[72px] row-span-2 sm:row-span-1"></a>
+  )}
   <div>
     <div class="flex items-baseline gap-3.5">
       <h3 class="text-xl sm:text-2xl font-normal tracking-tight leading-snug">

@@ -1,8 +1,6 @@
 # Map & Elevation Profile — Plan B: No static images, interactive map + chart
 
-Status: **candidate plan, not decided** — see `MAP_PROFILE_PLAN_A_STATIC.md` for the
-alternative. `PROJECT_SPEC.md`'s "Map rendering" / "Elevation profile" sections link here;
-a decision between A and B must be made before implementation starts.
+Status: **rejected** — `MAP_PROFILE_PLAN_A_STATIC.md` was chosen and implemented instead.
 
 ## Summary
 

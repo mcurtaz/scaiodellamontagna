@@ -1,0 +1,15 @@
+---
+interface Props {
+  imageUrl?: string;
+}
+
+const { imageUrl } = Astro.props;
+---
+
+{imageUrl ? (
+  <img src={imageUrl} alt="Profilo altimetrico della traccia" class="h-[300px] w-full rounded-lg object-cover" />
+) : (
+  <div class="media-placeholder media-placeholder-grid h-[300px] w-full flex items-end p-4">
+    <span class="font-mono-data text-[10px] tracking-widest uppercase text-inchiostro/80">Profilo altimetrico</span>
+  </div>
+)}

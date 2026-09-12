@@ -36,7 +36,7 @@ export function getHomeItinerari() {
     readItems("itinerari", {
       fields: [
         "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo",
-        "tempo_medio_ore", "is_loop", "punto_partenza", "punto_arrivo",
+        "tempo_medio_ore", "is_loop", "punto_partenza", "punto_arrivo", "mappa_statica",
       ],
       sort: ["-date_created"],
       limit: 2,
@@ -50,7 +50,7 @@ export function getItinerari() {
       fields: [
         "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo",
         "dislivello_negativo", "tempo_medio_ore", "is_loop", "is_child_friendly",
-        "is_winter_friendly", "punto_partenza", "punto_arrivo", "descrizione",
+        "is_winter_friendly", "punto_partenza", "punto_arrivo", "descrizione", "mappa_statica",
       ],
       sort: ["-date_created"],
     }),
@@ -64,6 +64,7 @@ export function getItinerariDetail() {
         "id", "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo",
         "dislivello_negativo", "tempo_medio_ore", "is_loop", "is_child_friendly",
         "is_winter_friendly", "punto_partenza", "punto_arrivo", "traccia_gpx", "descrizione",
+        "mappa_statica", "profilo_altimetrico",
         { autore: ["nome"] },
         { galleria: ["directus_files_id", "didascalia", "sort"] },
       ],
@@ -77,8 +78,8 @@ export async function getCorrelati(id: number) {
       filter: { _or: [{ itinerari_id: { _eq: id } }, { itinerario_correlato: { _eq: id } }] },
       fields: [
         "tipo",
-        { itinerari_id: ["id", "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo", "dislivello_negativo", "tempo_medio_ore", "is_loop", "punto_partenza", "punto_arrivo"] },
-        { itinerario_correlato: ["id", "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo", "dislivello_negativo", "tempo_medio_ore", "is_loop", "punto_partenza", "punto_arrivo"] },
+        { itinerari_id: ["id", "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo", "dislivello_negativo", "tempo_medio_ore", "is_loop", "punto_partenza", "punto_arrivo", "mappa_statica"] },
+        { itinerario_correlato: ["id", "titolo", "slug", "difficolta", "distanza_km", "dislivello_positivo", "dislivello_negativo", "tempo_medio_ore", "is_loop", "punto_partenza", "punto_arrivo", "mappa_statica"] },
       ],
     }),
   );

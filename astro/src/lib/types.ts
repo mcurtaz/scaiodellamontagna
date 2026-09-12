@@ -41,6 +41,8 @@ export interface Itinerario {
   punto_partenza: GeoPoint;
   punto_arrivo: GeoPoint;
   traccia_gpx: string | null;
+  mappa_statica: string | null;
+  profilo_altimetrico: string | null;
   descrizione: string;
   autore: number | Autore;
   galleria?: GalleriaImage[];

@@ -64,43 +64,32 @@ Instead:
 
 ### Map rendering
 
-**Reopened — two candidate plans, decision pending.** The original v1 decision
-(static image only, no client-side map JS) is being reconsidered now that an
-interactive map + linked elevation-profile hover is on the table. Two full
-implementation plans have been written up; **pick one before implementing**:
+**Decided: Plan A (static images).** Two full implementation plans were
+written up and compared; Plan A was chosen and is implemented —
+[`MAP_PROFILE_PLAN_A_STATIC.md`](./MAP_PROFILE_PLAN_A_STATIC.md). Rejected
+alternative: [`MAP_PROFILE_PLAN_B_INTERACTIVE.md`](./MAP_PROFILE_PLAN_B_INTERACTIVE.md)
+(interactive MapTiler map + Chart.js, no generated images).
 
-- [`MAP_PROFILE_PLAN_A_STATIC.md`](./MAP_PROFILE_PLAN_A_STATIC.md) — keeps the
-  original static-image decision. A Python container, triggered by a Directus
-  Flow on GPX upload, renders a static map PNG (free OSM tiles, self-hosted
-  rendering) and a static elevation-profile PNG, stored as new Directus file
-  fields (`mappa_statica`, `profilo_altimetrico`). No client-side map/chart JS
-  at all; the itinerari list thumbnail reuses `mappa_statica`.
-- [`MAP_PROFILE_PLAN_B_INTERACTIVE.md`](./MAP_PROFILE_PLAN_B_INTERACTIVE.md) —
-  reverses the static-image decision. No images generated at all: the list
-  thumbnail reuses a `galleria` image, and the detail page ships an
-  interactive MapTiler map plus a Chart.js elevation chart, both driven by a
-  small track-points JSON computed at Astro build time, with two-way hover
-  linking the map and the chart. No Directus schema/Flow changes, but adds
-  client-side map/chart JS and a live MapTiler account dependency (free tier
-  fits this project's volume, but is non-commercial-only and requires
-  attribution).
+A small self-hosted Python service (`map-generator/`), triggered by a
+Directus Flow on `traccia_gpx` upload/change (see
+[`DIRECTUS_MAP_FLOW.md`](./DIRECTUS_MAP_FLOW.md)), renders a static map PNG
+(free OSM tiles, self-hosted rendering, OSM attribution composited into the
+image) and a static elevation-profile PNG (matplotlib), stored as new
+Directus file fields (`mappa_statica`, `profilo_altimetrico` — see
+`DIRECTUS_SETUP.md` section 6). No client-side map/chart JS at all; the
+itinerari list thumbnail reuses `mappa_statica`.
 
-Research already done (see both plan docs for detail): MapTiler's free tier
-does **not** include its Static Maps API (paid-plan only), and its Cloud ToS
-prohibits self-hosting a static-image renderer against its free tiles — which
-is why Plan A uses free OpenStreetMap tiles instead of MapTiler for the
-static-image path.
+Research done before deciding (see both plan docs for detail): MapTiler's
+free tier does **not** include its Static Maps API (paid-plan only), and its
+Cloud ToS prohibits self-hosting a static-image renderer against its free
+tiles — which is why Plan A uses free OpenStreetMap tiles instead of MapTiler
+for the static-image path.
 
 ### Elevation profile ("profilo altimetrico") image
 
-**Folded into the map-rendering decision above — see the same two plan
-docs.** Plan A generates a static elevation-profile PNG (matplotlib) in the
-same Directus Flow/Python container as the static map, stored as
-`profilo_altimetrico`. Plan B renders an interactive Chart.js elevation
-chart client-side instead, from the same build-time track-points JSON used
-for the interactive map, with the chart and map hover-linked. No separate
-decision needed here — whichever plan is chosen for the map applies to the
-elevation profile too.
+**Folded into the map-rendering decision above.** The `map-generator` service
+generates the static elevation-profile PNG (matplotlib) in the same request
+as the static map, stored as `profilo_altimetrico`.
 
 ## Search
 
@@ -188,11 +177,10 @@ same size, from anywhere, never touch the EC2 box again.
 - Autori page: unhide and design listing (later).
 - Auto-suggested related routes (later, if manual curation proves limiting).
 - Articolo ↔ Itinerario cross-linking (later, if useful).
-- Map + elevation profile rendering: **decide between Plan A (static
-  images, Python container) and Plan B (interactive MapTiler map + Chart.js,
-  no generated images)** — see "Map rendering" above and the two linked plan
-  docs. Nothing else in this area should be implemented until this choice is
-  made.
+- Orphaned files on `itinerari` deletion: deleting a route does not delete its associated
+  files (`traccia_gpx`, `mappa_statica`, `profilo_altimetrico`, `galleria`) — see
+  `MAP_PROFILE_PLAN_A_STATIC.md`'s "Open questions" for the fix outline (a pre-delete
+  Filter Flow). Manual cleanup for now.
 - Backup schedule/retention specifics.
 - Production infra details (EC2 sizing, CloudFront config, DNS, TLS) — S3
   storage + CloudFront-in-front-of-Directus is the researched direction (see

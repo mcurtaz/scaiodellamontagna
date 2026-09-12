@@ -59,6 +59,7 @@ const [articoli, itinerari, counts] = await Promise.all([
           elevationGainM={r.dislivello_positivo}
           timeLabel={formatTimeLabel(r.tempo_medio_ore)}
           typeLabel={getTypeLabel(r)}
+          imageUrl={r.mappa_statica ? assetUrl(r.mappa_statica, { width: 200, quality: 70 }) : undefined}
         />
       ))}
     </div>
