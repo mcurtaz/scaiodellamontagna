@@ -7,6 +7,7 @@ import DataTable from "../../components/DataTable.astro";
 import MapThumbnail from "../../components/MapThumbnail.astro";
 import Gallery from "../../components/Gallery.astro";
 import RouteListItem from "../../components/RouteListItem.astro";
+import MarkdownContent from "../../components/MarkdownContent.astro";
 import { getItinerariDetail, getCorrelati, assetUrl } from "../../lib/directus";
 import {
   formatHoursDecimal, formatCoordinates, sameCoordinates, caratteristicheLines,
@@ -46,7 +47,6 @@ const rows = [
   },
 ];
 
-const paragraphs = it.descrizione.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 const caratteristiche = caratteristicheLines(it);
 
 const sortedGalleria = [...(it.galleria ?? [])].sort((a, b) => (a.sort ?? 0) - (b.sort ?? 0));
@@ -98,11 +98,7 @@ const correlatiGroups = TIPO_ORDER
   <section class="px-4 pb-8 sm:px-8 md:px-14">
     <SectionHeader label="DESCRIZIONE" />
     <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-[1.5fr_1fr] md:gap-12">
-      <div class="space-y-5">
-        {paragraphs.map((p) => (
-          <p class="text-[17.5px] leading-[1.72] text-inchiostro">{p}</p>
-        ))}
-      </div>
+      <MarkdownContent markdown={it.descrizione} />
       <div class="border-l-2 border-terra pl-5 text-sm leading-loose text-inchiostro/82">
         {caratteristiche.map((line) => <>{line}<br /></>)}
       </div>

@@ -1,0 +1,36 @@
+---
+import { marked } from "marked";
+
+interface Props {
+  markdown: string;
+}
+
+const { markdown } = Astro.props;
+const html = marked.parse(markdown, { async: false });
+---
+
+<div class="markdown-content space-y-5 text-[17.5px] leading-[1.72] text-inchiostro" set:html={html} />
+
+<style>
+  .markdown-content :global(h2) {
+    @apply mt-8 font-display text-xl font-semibold text-inchiostro first:mt-0;
+  }
+  .markdown-content :global(h3) {
+    @apply mt-6 font-display text-lg font-semibold text-inchiostro first:mt-0;
+  }
+  .markdown-content :global(strong) {
+    @apply font-semibold;
+  }
+  .markdown-content :global(a) {
+    @apply text-verde underline underline-offset-2;
+  }
+  .markdown-content :global(ul) {
+    @apply list-disc space-y-1 pl-5;
+  }
+  .markdown-content :global(ol) {
+    @apply list-decimal space-y-1 pl-5;
+  }
+  .markdown-content :global(blockquote) {
+    @apply border-l-2 border-terra pl-4 italic text-inchiostro/82;
+  }
+</style>

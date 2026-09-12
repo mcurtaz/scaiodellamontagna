@@ -4,6 +4,7 @@ import SageBand from "../../components/SageBand.astro";
 import SectionHeader from "../../components/SectionHeader.astro";
 import PageHeader from "../../components/PageHeader.astro";
 import ArticleListItem from "../../components/ArticleListItem.astro";
+import MarkdownContent from "../../components/MarkdownContent.astro";
 import { getArticoli, assetUrl } from "../../lib/directus";
 import { formatDate } from "../../lib/format";
 import type { Articolo, Autore } from "../../lib/types";
@@ -25,7 +26,6 @@ interface Props {
 }
 
 const { articolo, others } = Astro.props;
-const paragraphs = articolo.testo.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
 ---
 
 <Layout title={articolo.titolo} active="articoli">
@@ -51,11 +51,7 @@ const paragraphs = articolo.testo.split(/\n\s*\n/).map((p) => p.trim()).filter(B
   <div class="px-4 pb-8 sm:px-8 md:px-14">
     <SectionHeader label="TESTO" />
     <div class="mt-8 grid grid-cols-1 gap-4 md:grid-cols-[1.5fr_1fr] md:gap-12">
-      <div class="space-y-5">
-        {paragraphs.map((p) => (
-          <p class="text-[17.5px] leading-[1.72] text-inchiostro">{p}</p>
-        ))}
-      </div>
+      <MarkdownContent markdown={articolo.testo} />
     </div>
   </div>
 
