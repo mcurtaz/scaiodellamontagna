@@ -67,15 +67,17 @@ map-generator (Python container, internal docker network only)
   1. GET the GPX from Directus (/assets/{traccia_gpx})
   2. Parse with gpxpy → [{lat, lon, ele}, ...]
   3. Compute cumulative distance (Haversine) for the elevation profile
-  4. Render map PNG: staticmap (Komoot) or py-staticmaps, OSM tiles,
-     bounding box fit to track + padding, polyline + start/end markers,
-     with OSM copyright attribution composited onto the image itself
-     (required by OSM's tile usage policy — there's no live UI to attach
-     a control to, unlike an interactive map)
-  5. Render elevation PNG: matplotlib, distance (x) vs elevation (y),
-     smoothing/filtering the raw elevation series first (GPS/barometric
-     elevation is often jittery; an unsmoothed chart looks jagged and can
-     visually overstate small climbs)
+  4. Render map PNG: `staticmap` (Komoot), OSM tiles, bounding box fit to track +
+     padding, polyline + green/red start/end markers, then composite the OSM copyright
+     attribution onto the image with Pillow (`render.py:_draw_osm_attribution`) —
+     required by OSM's tile usage policy, since there's no live UI to attach a control
+     to, unlike an interactive map
+  5. Render elevation PNG: matplotlib, distance (x) vs elevation (y), series smoothed
+     with a simple moving average first (GPS/barometric elevation is often jittery; an
+     unsmoothed chart looks jagged and can visually overstate small climbs), filled area
+     baselined near the data's own minimum rather than zero (`render.py:render_elevation_png`)
+     — a zero baseline would make a realistic elevation range (e.g. 800-2000m) look like
+     a solid filled block instead of a readable profile shape
   6. Delete the item's previous mappa_statica/profilo_altimetrico files (if any)
   7. POST new files to Directus /files, then PATCH /items/itinerari/{id}
      to link mappa_statica + profilo_altimetrico
@@ -100,8 +102,10 @@ ever generated per route.
 - New docker-compose service, e.g. `map-generator`:
   - Python (FastAPI + uvicorn, or bare `http.server` — FastAPI recommended for minimal
     boilerplate), no port exposed externally (internal docker network only).
-  - Dependencies: `gpxpy`, `staticmap` (or `py-staticmaps`), `matplotlib`, `Pillow`,
-    `requests`.
+  - Dependencies: `gpxpy` (GPX parsing), `staticmap` (map tile rendering), `matplotlib`
+    (elevation chart), `Pillow` (compositing the OSM attribution text onto the map PNG),
+    `requests` (talking to the Directus REST API). See `map-generator/requirements.txt`
+    for pinned versions.
   - Env: `DIRECTUS_URL`, `DIRECTUS_TOKEN` (a **dedicated, scoped Directus role/token** —
     read on `itinerari`/`directus_files`, update on `itinerari`, create/update/delete on
     `directus_files`. Do **not** reuse the frontend's read-only public token.)

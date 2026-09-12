@@ -28,34 +28,67 @@ Settings → **Flows** → **Create Flow**.
 2. Trigger: **Event Hook** → type **Action** (non-blocking — the record should save immediately;
    generation can happen a moment later) → Scope: check **both** `items.create` and
    `items.update` → Collection: `itinerari`.
-3. Add a **Condition** operation, "GPX presente": `{{$trigger.payload.traccia_gpx}}` is set (not
-   empty). This reliably detects "GPX was touched" on both create (present in the full payload)
-   and update (Directus's `items.update` trigger payload only includes the fields that were
-   actually changed).
-4. On the **true** branch of that condition, add a second **Condition** operation, "È una
-   modifica?": `{{$trigger.event}}` equals `items.update`.
-5. On the **true** branch of the second condition (it's an update), add a **Webhook / Request
+3. Add a **Run Script** operation right after the trigger, "Controlla GPX presente":
+   ```js
+   module.exports = async function(data) {
+     return { hasGpx: Boolean(data.$trigger.payload && data.$trigger.payload.traccia_gpx) };
+   }
+   ```
+   This exists because on `items.update` the trigger payload only includes the fields that were
+   actually **changed** — editing any other field on the record makes `traccia_gpx` disappear
+   from `$trigger.payload` entirely (not just empty). A Condition operation filtering directly on
+   `$trigger.payload.traccia_gpx` validates the trigger data against a schema that treats a
+   filtered field as required, so a genuinely *missing* key throws a validation error and crashes
+   the run — it only tolerates the field being present-but-empty, not absent. Reading it in plain
+   JS here never throws regardless of whether the key exists, and normalizes both cases (missing
+   or empty) to `hasGpx: false`.
+4. Add a **Condition** operation, "GPX presente": field `$last.hasGpx`, operator **"equals"**,
+   value `true` (pick from the dropdown, don't type it as a raw string). Raw filter:
+   ```json
+   { "$last": { "hasGpx": { "_eq": true } } }
+   ```
+5. On the **false** branch of that condition, add a **Log to Console** operation, "Nessuna azione
+   (GPX non modificato)" (any message, e.g. `traccia_gpx non presente nel payload`). Leave nothing
+   attached after it. This exists purely so the run **ends in a resolved state** instead of an
+   unattended Condition rejection — a Condition operation's reject branch, if left without any
+   operation attached, marks the whole run as failed in the Flow's **Logs** list, even though
+   nothing actually went wrong (the record just didn't touch `traccia_gpx`). Without this, every
+   unrelated field edit on `itinerari` would clutter the Logs with "failed" runs, making it hard to
+   spot a genuine failure (a bad GPX, a webhook error) at a glance. (A **Run Script** returning a
+   plain object works identically here — `Log to Console` is just less to configure since it needs
+   no code.)
+6. On the **true** branch of that condition, add a second **Condition** operation, "È una
+   modifica?": field `$trigger.event`, operator **"equals"**, value `items.update`. Raw filter:
+   ```json
+   { "$trigger": { "event": { "_eq": "items.update" } } }
+   ```
+   (`$trigger.event`/`.keys`/`.key` are metadata about the trigger itself, always present
+   regardless of which fields changed, so they don't need the same script-based workaround.)
+7. On the **true** branch of the second condition (it's an update), add a **Webhook / Request
    URL** operation:
    - Method: `POST`
    - URL: `http://map-generator:8000/generate`
    - Body: `{ "item_id": {{$trigger.keys[0]}} }`
-6. On the **false** branch of the second condition (it's a create), add another **Webhook /
+8. On the **false** branch of the second condition (it's a create), add another **Webhook /
    Request URL** operation with the same method/URL but:
    - Body: `{ "item_id": {{$trigger.key}} }`
-7. Save.
+9. Save.
 
 ```
 Trigger (items.create + items.update on itinerari)
         │
         ▼
-Condition: traccia_gpx presente?
-   │ false            │ true
-   ▼                   ▼
- (stop)      Condition: è una modifica?
-                  │ true             │ false
-                  ▼                   ▼
-        Webhook → item_id:     Webhook → item_id:
-        {{$trigger.keys[0]}}   {{$trigger.key}}
+Run Script: hasGpx = Boolean(payload.traccia_gpx)
+        │
+        ▼
+Condition: $last.hasGpx == true?
+   │ false                          │ true
+   ▼                                 ▼
+Log to Console: "nessuna modifica"  Condition: è una modifica?
+ (ends run as "success")               │ true             │ false
+                                        ▼                   ▼
+                              Webhook → item_id:     Webhook → item_id:
+                              {{$trigger.keys[0]}}   {{$trigger.key}}
 ```
 
 ## Optional: failure visibility
