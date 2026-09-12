@@ -12,6 +12,8 @@ const html = marked.parse(markdown, { async: false });
 <div class="markdown-content space-y-5 text-[17.5px] leading-[1.72] text-inchiostro" set:html={html} />
 
 <style>
+  @reference "../styles/global.css";
+
   .markdown-content :global(h2) {
     @apply mt-8 font-display text-xl font-semibold text-inchiostro first:mt-0;
   }
